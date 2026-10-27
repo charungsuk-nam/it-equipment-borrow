@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระบบยืมอุปกรณ์ IT</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f4f7fb;
+      color: #202124;
+      font-family: "Sarabun", Tahoma, sans-serif;
+    }
+
+    input,
+    textarea,
+    button,
+    .swal2-popup,
+    .swal2-title,
+    .swal2-html-container {
+      font-family: "Sarabun", Tahoma, sans-serif !important;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      color: #1565c0;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      margin: 0 0 20px;
+      color: #5f6368;
+    }
+
+    .card {
+      margin-bottom: 16px;
+      padding: 20px;
+      border-radius: 14px;
+      background: #ffffff;
+      box-shadow: 0 2px 10px rgba(60, 64, 67, 0.12);
+    }
+
+    .user-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1px solid #c6dafc;
+      background: #e8f0fe;
+    }
+
+    .avatar {
+      display: flex;
+      width: 54px;
+      height: 54px;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 50%;
+      background: #1565c0;
+      color: #ffffff;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .user-name {
+      color: #174ea6;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .user-detail {
+      margin-top: 2px;
+      color: #5f6368;
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
+
+    input,
+    textarea,
+    button {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    button {
+      border: 0;
+      background: #1565c0;
+      color: #ffffff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0d47a1;
+    }
+
+    button:disabled {
+      background: #9aa0a6;
+      cursor: not-allowed;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .equipment-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .equipment-card {
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #e8eaed;
+      border-radius: 12px;
+      background: #ffffff;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .equipment-card:hover {
+      border-color: #1a73e8;
+      transform: translateY(-2px);
+    }
+
+    .equipment-card.selected {
+      border-color: #1a73e8;
+      background: #f8fbff;
+      box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.18);
+    }
+
+    .check-badge {
+      position: absolute;
+      z-index: 2;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      width: 30px;
+      height: 30px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #dadce0;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .selected .check-badge {
+      background: #1565c0;
+    }
+
+    .image-box {
+      display: flex;
+      height: 145px;
+      align-items: center;
+      justify-content: center;
+      background: #f1f3f4;
+      font-size: 48px;
+    }
+
+    .image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .equipment-content {
+      padding: 14px;
+    }
+
+    .equipment-name {
+      margin-bottom: 8px;
+      color: #1565c0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .equipment-detail {
+      margin: 4px 0;
+      color: #5f6368;
+      font-size: 14px;
+    }
+
+    .cart-box {
+      display: none;
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid #c6dafc;
+      border-radius: 8px;
+      background: #e8f0fe;
+    }
+
+    .cart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .cart-items {
+      margin-top: 10px;
+      line-height: 1.65;
+    }
+
+    .clear-button {
+      width: auto;
+      padding: 7px 11px;
+      background: #d93025;
+      font-size: 14px;
+    }
+
+    .loading,
+    .empty {
+      padding: 35px;
+      color: #5f6368;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 12px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>ระบบยืมอุปกรณ์ IT</h1>
+    <p class="subtitle">เลือกอุปกรณ์หลายชิ้น พร้อมบันทึกประวัติด้วยบัญชี LINE ของคุณ</p>
+
+    <div class="card user-box">
+      <div id="avatar" class="avatar">...</div>
+      <div>
+        <div id="userName" class="user-name">กำลังตรวจสอบบัญชี LINE...</div>
+        <div id="userDetail" class="user-detail">กรุณารอสักครู่</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label for="searchInput">ค้นหาอุปกรณ์</label>
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="ค้นหาด้วยรหัส ชื่อ ประเภท หรือสถานที่"
+        disabled
+      >
+    </div>
+
+    <div class="card">
+      <strong>อุปกรณ์ที่พร้อมให้ยืม</strong>
+      <div id="equipmentList" class="loading">กำลังเตรียมระบบ...</div>
+
+      <div id="cartBox" class="cart-box">
+        <div class="cart-header">
+          <strong id="cartTitle">เลือกอุปกรณ์แล้ว 0 ชิ้น</strong>
+          <button class="clear-button" type="button" onclick="clearCart()">
+            ล้างรายการ
+          </button>
+        </div>
+        <div id="cartItems" class="cart-items"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <form id="loanForm">
+        <div class="form-grid">
+          <div>
+            <label>ผู้ยืม</label>
+            <input id="borrowerName" type="text" readonly value="กำลังตรวจสอบ...">
+          </div>
+
+          <div>
+            <label for="dueDate">กำหนดคืน</label>
+            <input id="dueDate" type="date" disabled>
+          </div>
+
+          <div class="full-width">
+            <label for="purpose">วัตถุประสงค์การยืม *</label>
+            <textarea
+              id="purpose"
+              placeholder="เช่น ใช้สำหรับประชุม จัดอบรม หรือปฏิบัติงานนอกสถานที่"
+              disabled
+              required
+            ></textarea>
+          </div>
+
+          <div class="full-width">
+            <button id="submitButton" type="submit" disabled>
+              กำลังเตรียมระบบ...
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <iframe id="postFrame" name="postFrame" style="display:none;"></iframe>
+
+  <script>
+    const CONFIG = {
+      LIFF_ID: '2012231859-0lxjeI3D',
+      API_URL: 'https://script.google.com/macros/s/AKfycbxokOJDBVKK2VgM06iYhCnZ4mjPcXnN9FD-4uGx_e0qbAdsR4rPHlo-jPBZaz2tCroL/exec'
+    };
+
+    let idToken = '';
+    let currentUser = null;
+    let selectedEquipment = {};
+    let currentEquipment = [];
+    let searchTimer = null;
+    let systemReady = false;
+
+    window.addEventListener('load', initializeSystem);
+
+    async function initializeSystem() {
+      try {
+        validateConfig();
+
+        await liff.init({
+          liffId: CONFIG.LIFF_ID
+        });
+
+        if (!liff.isLoggedIn()) {
+          liff.login({
+            redirectUri: window.location.href
+          });
+          return;
+        }
+
+        idToken = liff.getIDToken();
+
+        if (!idToken) {
+          throw new Error('ไม่พบ LINE ID Token กรุณาเปิดระบบผ่าน LINE อีกครั้ง');
+        }
+
+        currentUser = await apiGet('bootstrap', {
+          idToken: idToken
+        });
+
+        renderUser(currentUser);
+        enableForm();
+        searchEquipment();
+
+        if (currentUser.isNewUser) {
+          Swal.fire({
+            icon: 'success',
+            title: 'ลงทะเบียนสำเร็จ',
+            text: `ยินดีต้อนรับ ${currentUser.fullName}`,
+            confirmButtonColor: '#1565c0'
+          });
+        }
+
+      } catch (error) {
+        showError(error);
+        document.getElementById('userName').textContent = 'ไม่สามารถเข้าสู่ระบบได้';
+        document.getElementById('userDetail').textContent = 'กรุณาเปิดผ่าน LINE Official Account';
+      }
+    }
+
+    function validateConfig() {
+      if (
+        CONFIG.LIFF_ID.includes('ใส่-') ||
+        CONFIG.API_URL.includes('ใส่-')
+      ) {
+        throw new Error('กรุณาตั้งค่า LIFF_ID และ API_URL ในไฟล์ index.html ก่อนใช้งาน');
+      }
+    }
+
+    function renderUser(user) {
+      const avatar = document.getElementById('avatar');
+      const userName = document.getElementById('userName');
+      const userDetail = document.getElementById('userDetail');
+
+      if (user.pictureUrl) {
+        avatar.innerHTML = `<img src="${escapeHtml(user.pictureUrl)}" alt="รูปโปรไฟล์">`;
+      } else {
+        avatar.textContent = String(user.fullName || '?').charAt(0);
+      }
+
+      userName.textContent = user.fullName;
+      userDetail.textContent = `สิทธิ์: ${user.role}${user.department ? ' · ' + user.department : ''}`;
+      document.getElementById('borrowerName').value = user.fullName;
+    }
+
+    function enableForm() {
+      systemReady = true;
+
+      document.getElementById('searchInput').disabled = false;
+      document.getElementById('dueDate').disabled = false;
+      document.getElementById('purpose').disabled = false;
+
+      const button = document.getElementById('submitButton');
+      button.disabled = false;
+      button.textContent = 'ยืนยันการยืมอุปกรณ์';
+
+      document
+        .getElementById('searchInput')
+        .addEventListener('input', searchEquipment);
+
+      document
+        .getElementById('loanForm')
+        .addEventListener('submit', submitLoan);
+    }
+
+    function apiGet(action, parameters = {}) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `callback_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
+
+        const query = new URLSearchParams({
+          action: action,
+          callback: callbackName,
+          ...parameters
+        });
+
+        const script = document.createElement('script');
+        const timeout = setTimeout(() => {
+          cleanup();
+          reject(new Error('การเชื่อมต่อกับระบบใช้เวลานานเกินไป'));
+        }, 30000);
+
+        function cleanup() {
+          clearTimeout(timeout);
+          delete window[callbackName];
+          script.remove();
+        }
+
+        window[callbackName] = response => {
+          cleanup();
+
+          if (!response.success) {
+            reject(new Error(response.message || 'เกิดข้อผิดพลาด'));
+            return;
+          }
+
+          resolve(response.data);
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error('ไม่สามารถเชื่อมต่อกับระบบฐานข้อมูลได้'));
+        };
+
+        script.src = `${CONFIG.API_URL}?${query.toString()}`;
+        document.body.appendChild(script);
+      });
+    }
+
+    function searchEquipment() {
+      if (!systemReady) return;
+
+      clearTimeout(searchTimer);
+
+      searchTimer = setTimeout(async () => {
+        const keyword = document.getElementById('searchInput').value.trim();
+        const list = document.getElementById('equipmentList');
+
+        list.className = 'loading';
+        list.textContent = 'กำลังค้นหาอุปกรณ์...';
+
+        try {
+          currentEquipment = await apiGet('searchEquipment', {
+            idToken: idToken,
+            keyword: keyword
+          });
+
+          renderEquipment(currentEquipment);
+
+        } catch (error) {
+          showError(error);
+        }
+      }, 250);
+    }
+
+    function renderEquipment(items) {
+      const list = document.getElementById('equipmentList');
+      list.innerHTML = '';
+
+      if (!items.length) {
+        list.className = 'empty';
+        list.textContent = 'ไม่พบอุปกรณ์ที่พร้อมให้ยืม';
+        return;
+      }
+
+      list.className = 'equipment-list';
+
+      items.forEach(item => {
+        const selected = Boolean(selectedEquipment[item.equipmentId]);
+        const card = document.createElement('div');
+
+        card.className = `equipment-card${selected ? ' selected' : ''}`;
+
+        const imageHtml = item.imageUrl
+          ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.equipmentName)}" onerror="this.parentElement.innerHTML='🖥️'">`
+          : '🖥️';
+
+        card.innerHTML = `
+          <div class="check-badge">${selected ? '✓' : '+'}</div>
+          <div class="image-box">${imageHtml}</div>
+          <div class="equipment-content">
+            <div class="equipment-name">${escapeHtml(item.equipmentName)}</div>
+            <div class="equipment-detail"><b>รหัส:</b> ${escapeHtml(item.equipmentId)}</div>
+            <div class="equipment-detail"><b>ประเภท:</b> ${escapeHtml(item.category || '-')}</div>
+            <div class="equipment-detail"><b>สถานที่:</b> ${escapeHtml(item.location || '-')}</div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => toggleEquipment(item));
+        list.appendChild(card);
+      });
+    }
+
+    function toggleEquipment(item) {
+      if (selectedEquipment[item.equipmentId]) {
+        delete selectedEquipment[item.equipmentId];
+      } else {
+        selectedEquipment[item.equipmentId] = item;
+      }
+
+      updateCart();
+      renderEquipment(currentEquipment);
+    }
+
+    function clearCart() {
+      selectedEquipment = {};
+      updateCart();
+      renderEquipment(currentEquipment);
+    }
+
+    function updateCart() {
+      const ids = Object.keys(selectedEquipment);
+      const cartBox = document.getElementById('cartBox');
+      const cartTitle = document.getElementById('cartTitle');
+      const cartItems = document.getElementById('cartItems');
+
+      if (!ids.length) {
+        cartBox.style.display = 'none';
+        return;
+      }
+
+      cartBox.style.display = 'block';
+      cartTitle.textContent = `เลือกอุปกรณ์แล้ว ${ids.length} ชิ้น`;
+
+      cartItems.innerHTML = ids
+        .map(id => {
+          const item = selectedEquipment[id];
+          return `• ${escapeHtml(item.equipmentName)} (${escapeHtml(item.equipmentId)})`;
+        })
+        .join('<br>');
+    }
+
+    async function submitLoan(event) {
+      event.preventDefault();
+
+      const equipmentIds = Object.keys(selectedEquipment);
+      const dueDate = document.getElementById('dueDate').value;
+      const purpose = document.getElementById('purpose').value.trim();
+
+      if (!equipmentIds.length) {
+        showError('กรุณาเลือกอุปกรณ์อย่างน้อย 1 ชิ้น');
+        return;
+      }
+
+      if (!purpose) {
+        showError('กรุณาระบุวัตถุประสงค์การยืม');
+        return;
+      }
+
+      const itemsHtml = equipmentIds
+        .map(id => {
+          const item = selectedEquipment[id];
+          return `• ${escapeHtml(item.equipmentName)} (${escapeHtml(item.equipmentId)})`;
+        })
+        .join('<br>');
+
+      const confirm = await Swal.fire({
+        icon: 'question',
+        title: `ยืนยันการยืม ${equipmentIds.length} ชิ้น`,
+        html: `
+          <div style="text-align:left;line-height:1.8;">
+            <b>ผู้ยืม:</b> ${escapeHtml(currentUser.fullName)}<br>
+            <b>กำหนดคืน:</b> ${escapeHtml(formatThaiDate(dueDate))}<br>
+            <b>วัตถุประสงค์:</b> ${escapeHtml(purpose)}<br>
+            <div style="margin-top:10px;padding:10px;border-radius:6px;background:#f1f3f4;">
+              <b>รายการอุปกรณ์:</b><br>
+              ${itemsHtml}
+            </div>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยันบันทึก',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#1565c0'
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      const button = document.getElementById('submitButton');
+      button.disabled = true;
+      button.textContent = 'กำลังบันทึกรายการ...';
+
+      try {
+        const requestId = createRequestId();
+
+        await postLoan({
+          action: 'createLoan',
+          requestId: requestId,
+          idToken: idToken,
+          equipmentIds: equipmentIds,
+          dueDate: dueDate,
+          purpose: purpose
+        });
+
+        const result = await waitForRequestResult(requestId);
+
+        if (result.status !== 'SUCCESS') {
+          throw new Error(result.message || 'ไม่สามารถบันทึกการยืมได้');
+        }
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'บันทึกการยืมสำเร็จ',
+          html: `
+            <div style="text-align:left;line-height:1.8;">
+              <b>เลขที่บิล:</b> ${escapeHtml(result.result.loanId)}<br>
+              <b>ผู้ยืม:</b> ${escapeHtml(result.result.borrowerName)}<br>
+              <b>จำนวน:</b> ${escapeHtml(result.result.equipmentCount)} ชิ้น<br>
+              <b>กำหนดคืน:</b> ${escapeHtml(result.result.dueDate)}
+            </div>
+          `,
+          confirmButtonColor: '#1565c0'
+        });
+
+        document.getElementById('loanForm').reset();
+        document.getElementById('borrowerName').value = currentUser.fullName;
+
+        selectedEquipment = {};
+        updateCart();
+        searchEquipment();
+
+      } catch (error) {
+        showError(error);
+        searchEquipment();
+
+      } finally {
+        button.disabled = false;
+        button.textContent = 'ยืนยันการยืมอุปกรณ์';
+      }
+    }
+
+    function postLoan(payload) {
+      return new Promise((resolve) => {
+        const form = document.createElement('form');
+
+        form.method = 'POST';
+        form.action = CONFIG.API_URL;
+        form.target = 'postFrame';
+        form.style.display = 'none';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'payload';
+        input.value = JSON.stringify(payload);
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+        form.remove();
+
+        setTimeout(resolve, 800);
+      });
+    }
+
+    async function waitForRequestResult(requestId) {
+      const maximumAttempts = 25;
+
+      for (let attempt = 0; attempt < maximumAttempts; attempt++) {
+        await delay(1000);
+
+        const result = await apiGet('requestStatus', {
+          idToken: idToken,
+          requestId: requestId
+        });
+
+        if (result.status === 'SUCCESS' || result.status === 'ERROR') {
+          return result;
+        }
+      }
+
+      throw new Error('ระบบบันทึกข้อมูลใช้เวลานานเกินไป กรุณาตรวจสอบประวัติการยืมอีกครั้ง');
+    }
+
+    function createRequestId() {
+      if (window.crypto && crypto.randomUUID) {
+        return crypto.randomUUID().replace(/-/g, '');
+      }
+
+      return `REQ${Date.now()}${Math.random().toString(36).substring(2)}`;
+    }
+
+    function delay(milliseconds) {
+      return new Promise(resolve => setTimeout(resolve, milliseconds));
+    }
+
+    function formatThaiDate(value) {
+      if (!value) return '-';
+
+      const parts = value.split('-');
+
+      if (parts.length !== 3) return value;
+
+      return `${parts[2]}/${parts[1]}/${Number(parts[0]) + 543}`;
+    }
+
+    function showError(error) {
+      const message = typeof error === 'string'
+        ? error
+        : (error && error.message ? error.message : 'เกิดข้อผิดพลาด');
+
+      Swal.fire({
+        icon: 'error',
+        title: 'ไม่สามารถทำรายการได้',
+        text: message,
+        confirmButtonColor: '#1565c0'
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
