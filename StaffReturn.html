@@ -24,9 +24,7 @@
       --orange: #d97706;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -36,21 +34,10 @@
       font-family: "Prompt", sans-serif;
     }
 
-    button,
-    input,
-    select,
-    textarea {
-      font-family: inherit;
-    }
+    button, input, select, textarea { font-family: inherit; }
+    button { cursor: pointer; }
 
-    button {
-      cursor: pointer;
-    }
-
-    .layout {
-      display: flex;
-      min-height: 100vh;
-    }
+    .layout { display: flex; min-height: 100vh; }
 
     .sidebar {
       position: fixed;
@@ -82,18 +69,8 @@
       background: linear-gradient(135deg, #3b82f6, #14b8a6);
     }
 
-    .brand h1 {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 600;
-      line-height: 1.35;
-    }
-
-    .brand p {
-      margin: 2px 0 0;
-      color: #94a3b8;
-      font-size: 10px;
-    }
+    .brand h1 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.35; }
+    .brand p { margin: 2px 0 0; color: #94a3b8; font-size: 10px; }
 
     .staff-box {
       display: flex;
@@ -116,27 +93,15 @@
       background: #334155;
     }
 
-    .staff-box div:last-child {
-      min-width: 0;
-    }
-
-    .staff-box strong,
-    .staff-box span {
+    .staff-box div:last-child { min-width: 0; }
+    .staff-box strong, .staff-box span {
       display: block;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-
-    .staff-box strong {
-      font-size: 12px;
-    }
-
-    .staff-box span {
-      margin-top: 2px;
-      color: #94a3b8;
-      font-size: 10px;
-    }
+    .staff-box strong { font-size: 12px; }
+    .staff-box span { margin-top: 2px; color: #94a3b8; font-size: 10px; }
 
     .nav-btn {
       width: 100%;
@@ -150,16 +115,8 @@
       transition: 0.2s;
     }
 
-    .nav-btn:hover {
-      color: white;
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .nav-btn.active {
-      color: white;
-      font-weight: 500;
-      background: var(--blue);
-    }
+    .nav-btn:hover { color: white; background: rgba(255, 255, 255, 0.08); }
+    .nav-btn.active { color: white; font-weight: 500; background: var(--blue); }
 
     .sidebar-footer {
       padding: 14px 9px 0;
@@ -169,21 +126,9 @@
       line-height: 1.7;
     }
 
-    .main {
-      width: 100%;
-      padding: 30px;
-      margin-left: 265px;
-    }
-
-    .section {
-      display: none;
-      max-width: 1250px;
-      margin: 0 auto;
-    }
-
-    .section.active {
-      display: block;
-    }
+    .main { width: 100%; padding: 30px; margin-left: 265px; }
+    .section { display: none; max-width: 1250px; margin: 0 auto; }
+    .section.active { display: block; }
 
     .page-header {
       display: flex;
@@ -192,24 +137,10 @@
       justify-content: space-between;
       margin-bottom: 22px;
     }
+    .page-header h2 { margin: 0; font-size: 24px; font-weight: 600; }
+    .page-header p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
 
-    .page-header h2 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 600;
-    }
-
-    .page-header p {
-      margin: 5px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .action-row {
-      display: flex;
-      gap: 9px;
-      flex-wrap: wrap;
-    }
+    .action-row { display: flex; gap: 9px; flex-wrap: wrap; }
 
     .card {
       background: var(--card);
@@ -238,17 +169,9 @@
       border: 1px solid var(--border);
       border-radius: 10px;
     }
+    .search:focus { background: white; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
 
-    .search:focus {
-      background: white;
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-    }
-
-    .summary {
-      color: var(--muted);
-      font-size: 12px;
-    }
+    .summary { color: var(--muted); font-size: 12px; }
 
     .btn {
       padding: 10px 14px;
@@ -258,43 +181,14 @@
       border-radius: 10px;
       transition: 0.2s;
     }
-
-    .btn-primary {
-      color: white;
-      background: var(--blue);
-    }
-
-    .btn-primary:hover {
-      background: var(--blue-dark);
-    }
-
-    .btn-success {
-      color: white;
-      background: var(--green);
-    }
-
-    .btn-success:hover {
-      background: #047857;
-    }
-
-    .btn-outline {
-      color: #334155;
-      background: white;
-      border: 1px solid var(--border);
-    }
-
-    .btn-outline:hover {
-      background: #f8fafc;
-    }
-
-    .btn-danger {
-      color: var(--red);
-      background: #fee2e2;
-    }
-
-    .btn-danger:hover {
-      background: #fecaca;
-    }
+    .btn-primary { color: white; background: var(--blue); }
+    .btn-primary:hover { background: var(--blue-dark); }
+    .btn-success { color: white; background: var(--green); }
+    .btn-success:hover { background: #047857; }
+    .btn-outline { color: #334155; background: white; border: 1px solid var(--border); }
+    .btn-outline:hover { background: #f8fafc; }
+    .btn-danger { color: var(--red); background: #fee2e2; }
+    .btn-danger:hover { background: #fecaca; }
 
     .grid {
       display: grid;
@@ -310,51 +204,14 @@
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     }
 
-    .item-top {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-    }
+    .item-top { display: flex; gap: 12px; align-items: flex-start; }
+    .item-icon, .item-image { width: 54px; height: 54px; flex-shrink: 0; border-radius: 12px; }
+    .item-icon { display: grid; font-size: 25px; place-items: center; background: #eff6ff; }
+    .item-image { object-fit: cover; background: #eff6ff; }
 
-    .item-icon,
-    .item-image {
-      width: 54px;
-      height: 54px;
-      flex-shrink: 0;
-      border-radius: 12px;
-    }
-
-    .item-icon {
-      display: grid;
-      font-size: 25px;
-      place-items: center;
-      background: #eff6ff;
-    }
-
-    .item-image {
-      object-fit: cover;
-      background: #eff6ff;
-    }
-
-    .item-title {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .item-title h3 {
-      margin: 0;
-      overflow: hidden;
-      font-size: 15px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .item-id {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 11px;
-      font-family: monospace;
-    }
+    .item-title { min-width: 0; flex: 1; }
+    .item-title h3 { margin: 0; overflow: hidden; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+    .item-id { margin-top: 3px; color: var(--muted); font-size: 11px; font-family: monospace; }
 
     .badge {
       display: inline-flex;
@@ -364,190 +221,52 @@
       white-space: nowrap;
       border-radius: 999px;
     }
+    .available { color: #047857; background: #d1fae5; }
+    .borrowed { color: #b45309; background: #fef3c7; }
+    .maintenance { color: #b91c1c; background: #fee2e2; }
+    .inactive { color: #475569; background: #e2e8f0; }
 
-    .available {
-      color: #047857;
-      background: #d1fae5;
-    }
+    .details { padding: 11px; margin: 15px 0; font-size: 12px; background: #f8fafc; border-radius: 12px; }
+    .row { display: flex; gap: 10px; justify-content: space-between; padding: 4px 0; }
+    .row span:first-child { flex-shrink: 0; color: var(--muted); }
+    .row span:last-child { text-align: right; word-break: break-word; }
 
-    .borrowed {
-      color: #b45309;
-      background: #fef3c7;
-    }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+    .info { min-width: 0; padding: 9px; background: #f8fafc; border-radius: 10px; }
+    .info.full { grid-column: 1 / -1; }
+    .info label { display: block; margin-bottom: 3px; color: var(--muted); font-size: 10px; }
+    .info span { display: block; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 
-    .maintenance {
-      color: #b91c1c;
-      background: #fee2e2;
-    }
+    .card-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
-    .inactive {
-      color: #475569;
-      background: #e2e8f0;
-    }
-
-    .details {
-      padding: 11px;
-      margin: 15px 0;
-      font-size: 12px;
-      background: #f8fafc;
-      border-radius: 12px;
-    }
-
-    .row {
-      display: flex;
-      gap: 10px;
-      justify-content: space-between;
-      padding: 4px 0;
-    }
-
-    .row span:first-child {
-      flex-shrink: 0;
-      color: var(--muted);
-    }
-
-    .row span:last-child {
-      text-align: right;
-      word-break: break-word;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin: 14px 0;
-    }
-
-    .info {
-      min-width: 0;
-      padding: 9px;
-      background: #f8fafc;
-      border-radius: 10px;
-    }
-
-    .info.full {
-      grid-column: 1 / -1;
-    }
-
-    .info label {
-      display: block;
-      margin-bottom: 3px;
-      color: var(--muted);
-      font-size: 10px;
-    }
-
-    .info span {
-      display: block;
-      overflow: hidden;
-      font-size: 11px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .card-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-
-    .state {
-      padding: 52px 20px;
-      color: var(--muted);
-      font-size: 13px;
-      text-align: center;
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-    }
-
+    .state { padding: 52px 20px; color: var(--muted); font-size: 13px; text-align: center; background: white; border: 1px solid var(--border); border-radius: 16px; }
     .spinner {
-      width: 34px;
-      height: 34px;
-      margin: 0 auto 13px;
-      border: 4px solid #dbeafe;
-      border-top-color: var(--blue);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      width: 34px; height: 34px; margin: 0 auto 13px;
+      border: 4px solid #dbeafe; border-top-color: var(--blue);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
+    .about { max-width: 760px; padding: 24px; }
+    .about h3 { margin-top: 0; }
+    .about ul { padding-left: 20px; color: #475569; font-size: 13px; line-height: 1.9; }
 
-    .about {
-      max-width: 760px;
-      padding: 24px;
-    }
-
-    .about h3 {
-      margin-top: 0;
-    }
-
-    .about ul {
-      padding-left: 20px;
-      color: #475569;
-      font-size: 13px;
-      line-height: 1.9;
-    }
-
-    .mobile-bar {
-      display: none;
-    }
+    .mobile-bar { display: none; }
 
     @media (max-width: 760px) {
-      .sidebar {
-        display: none;
-      }
-
-      .main {
-        padding: 16px;
-        padding-top: 78px;
-        margin-left: 0;
-      }
-
+      .sidebar { display: none; }
+      .main { padding: 16px; padding-top: 78px; margin-left: 0; }
       .mobile-bar {
-        position: fixed;
-        inset: 0 0 auto;
-        z-index: 20;
-        display: flex;
-        height: 62px;
-        padding: 0 15px;
-        color: white;
-        align-items: center;
-        justify-content: space-between;
-        background: var(--navy);
+        position: fixed; inset: 0 0 auto; z-index: 20;
+        display: flex; height: 62px; padding: 0 15px; color: white;
+        align-items: center; justify-content: space-between; background: var(--navy);
       }
-
-      .mobile-bar strong {
-        font-size: 13px;
-      }
-
-      .mobile-tab {
-        padding: 7px 9px;
-        color: #e2e8f0;
-        font-size: 10px;
-        background: #334155;
-        border: 0;
-        border-radius: 8px;
-      }
-
-      .mobile-tab.active {
-        color: white;
-        background: var(--blue);
-      }
-
-      .page-header {
-        display: block;
-      }
-
-      .page-header .action-row {
-        margin-top: 14px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
+      .mobile-bar strong { font-size: 13px; }
+      .mobile-tab { padding: 7px 9px; color: #e2e8f0; font-size: 10px; background: #334155; border: 0; border-radius: 8px; }
+      .mobile-tab.active { color: white; background: var(--blue); }
+      .page-header { display: block; }
+      .page-header .action-row { margin-top: 14px; }
+      .grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -595,7 +314,6 @@
     </aside>
 
     <main class="main">
-      <!-- หน้าตรวจรับคืน -->
       <section id="returnsSection" class="section active">
         <div class="page-header">
           <div>
@@ -608,18 +326,13 @@
         </div>
 
         <div class="card toolbar">
-          <input
-            id="loanSearch"
-            class="search"
-            type="text"
-            placeholder="ค้นหาชื่ออุปกรณ์, รหัส, ผู้ยืม หรือวัตถุประสงค์"
-          >
-          <span id="loanCount" class="summary">กำลังโหลดข้อมูล...</span>
+          <input id="loanSearch" class="search" type="text" placeholder="ค้นหาชื่ออุปกรณ์, รหัส, ผู้ยืม หรือวัตถุประสงค์">
+          <span id="loanCount" class="summary">กำลังตรวจสอบสิทธิ์...</span>
         </div>
 
         <div id="loanLoading" class="state">
           <div class="spinner"></div>
-          กำลังโหลดรายการยืม...
+          กำลังตรวจสอบสิทธิ์และโหลดข้อมูล...
         </div>
 
         <div id="loanEmpty" class="state" style="display:none;">
@@ -631,7 +344,6 @@
         <div id="loanList" class="grid"></div>
       </section>
 
-      <!-- หน้าจัดการอุปกรณ์ -->
       <section id="equipmentSection" class="section">
         <div class="page-header">
           <div>
@@ -645,13 +357,8 @@
         </div>
 
         <div class="card toolbar">
-          <input
-            id="equipmentSearch"
-            class="search"
-            type="text"
-            placeholder="ค้นหารหัส ชื่อ หมวดหมู่ หรือสถานที่"
-          >
-          <span id="equipmentCount" class="summary">กำลังโหลดข้อมูล...</span>
+          <input id="equipmentSearch" class="search" type="text" placeholder="ค้นหารหัส ชื่อ หมวดหมู่ หรือสถานที่">
+          <span id="equipmentCount" class="summary">กำลังตรวจสอบสิทธิ์...</span>
         </div>
 
         <div id="equipmentLoading" class="state">
@@ -668,7 +375,6 @@
         <div id="equipmentList" class="grid"></div>
       </section>
 
-      <!-- หน้าเกี่ยวกับ -->
       <section id="aboutSection" class="section">
         <div class="page-header">
           <div>
@@ -692,11 +398,6 @@
   </div>
 
   <script>
-    /*
-      สำคัญ:
-      1) ใส่ LIFF ID ของ LIFF App ที่ Endpoint ชี้ไปยัง StaffReturn.html
-      2) API_URL ใช้ URL /exec ของ Apps Script Web App
-    */
     const CONFIG = {
       LIFF_ID: '2012231859-0lxjel3D',
       API_URL: 'https://script.google.com/macros/s/AKfycbxokOJDBVKK2VgM06iYhCnZ4mjPcXnN9FD-4uGx_e0qbAdsR4rPHlo-jPBZaz2tCroL/exec'
@@ -710,16 +411,12 @@
     document.addEventListener('DOMContentLoaded', initSystem);
 
     async function initSystem() {
+      // ผูกเมนูก่อนทันที เพื่อให้กดเปลี่ยนหน้า Tab ดูเมนูอื่นๆ ได้แม้กำลังโหลด
       bindEvents();
-      setLoanLoading(true);
-      setEquipmentLoading(true);
 
       try {
-        if (
-          !CONFIG.LIFF_ID ||
-          CONFIG.LIFF_ID === 'ใส่_LIFF_ID_ของหน้า_StaffReturn_ที่นี่'
-        ) {
-          throw new Error('กรุณากำหนด LIFF_ID ของหน้า StaffReturn.html ก่อนใช้งาน');
+        if (!CONFIG.LIFF_ID || CONFIG.LIFF_ID.includes('ใส่_LIFF_ID')) {
+          throw new Error('กรุณากำหนด LIFF_ID ให้ถูกต้องก่อนใช้งาน');
         }
 
         await liff.init({ liffId: CONFIG.LIFF_ID });
@@ -732,18 +429,17 @@
         idToken = liff.getIDToken();
 
         if (!idToken) {
-          throw new Error('ไม่พบ LINE ID Token กรุณาเปิดหน้านี้ผ่าน LIFF URL');
+          throw new Error('ไม่พบ LINE ID Token กรุณาเปิดหน้านี้ผ่านลิงก์ LIFF');
         }
 
-        const response = await apiGet('staffBootstrap', {
-          idToken: idToken
-        });
+        // ยิงเช็กสิทธิ์และดึงข้อมูลหลังบ้าน
+        const response = await apiGet('staffBootstrap', { idToken: idToken });
 
         if (!response || !response.success) {
           throw new Error(
             response && response.message
               ? response.message
-              : 'ไม่สามารถตรวจสอบสิทธิ์การใช้งานได้'
+              : 'บัญชีนี้ไม่มีสิทธิ์ใช้งานระบบหลังบ้าน'
           );
         }
 
@@ -751,13 +447,9 @@
         allLoans = response.data.activeLoans || [];
         allEquipment = response.data.equipment || [];
 
-        document.getElementById('staffName').textContent =
-          currentStaff.fullName || 'เจ้าหน้าที่';
-
+        document.getElementById('staffName').textContent = currentStaff.fullName || 'เจ้าหน้าที่';
         document.getElementById('staffRole').textContent =
-          currentStaff.role === 'ADMIN'
-            ? 'ผู้ดูแลระบบ (ADMIN)'
-            : 'เจ้าหน้าที่ (STAFF)';
+          currentStaff.role === 'ADMIN' ? 'ผู้ดูแลระบบ (ADMIN)' : 'เจ้าหน้าที่ (STAFF)';
 
         renderLoans(allLoans);
         renderEquipment(allEquipment);
@@ -765,27 +457,34 @@
       } catch (error) {
         console.error(error);
 
-        document.getElementById('staffName').textContent = 'เข้าใช้งานไม่ได้';
-        document.getElementById('staffRole').textContent = 'ตรวจสอบสิทธิ์ไม่สำเร็จ';
+        document.getElementById('staffName').textContent = 'ไม่มีสิทธิ์เข้าถึง';
+        document.getElementById('staffRole').textContent = 'ถูกปฏิเสธการเข้าใช้งาน';
 
         setLoanLoading(false);
         setEquipmentLoading(false);
 
+        // เด้ง Popup แจ้งเตือนสิทธิ์ทันที
+        await Swal.fire({
+          icon: 'error',
+          title: 'ไม่ได้รับอนุญาตให้เข้าใช้งาน',
+          text: error.message || 'หน้านี้สำหรับเจ้าหน้าที่ (STAFF หรือ ADMIN) เท่านั้น',
+          confirmButtonText: 'รับทราบ',
+          confirmButtonColor: '#dc2626',
+          allowOutsideClick: false
+        });
+
+        // ปิดหรือพับหน้าจอหนี หรือปล่อยให้ดูหน้าจอเปล่าพร้อมข้อความแจ้งเตือน
         document.getElementById('loanList').innerHTML = `
           <div class="state" style="grid-column:1/-1;">
-            <strong>ไม่สามารถเปิดระบบหลังบ้านได้</strong>
-            <div style="margin-top:8px;color:#dc2626;">
-              ${escapeHtml(error.message || 'เกิดข้อผิดพลาด')}
+            <strong style="color:#dc2626;font-size:16px;">❌ ไม่มีสิทธิ์เข้าถึงระบบหลังบ้าน</strong>
+            <div style="margin-top:8px;color:#475569;">
+              ${escapeHtml(error.message)}
+            </div>
+            <div style="margin-top:12px;font-size:11px;color:#94a3b8;">
+              หากคุณเป็นเจ้าหน้าที่ กรุณาตรวจสอบสิทธิ์ Role ในชีต Users ว่าเป็น STAFF หรือ ADMIN แล้วหรือยัง
             </div>
           </div>
         `;
-
-        Swal.fire({
-          icon: 'error',
-          title: 'เข้าใช้งานไม่ได้',
-          text: error.message || 'กรุณาตรวจสอบสิทธิ์บัญชี LINE',
-          confirmButtonText: 'ตกลง'
-        });
       }
     }
 
@@ -811,31 +510,23 @@
         button.classList.remove('active');
       });
 
-      document.getElementById(tabName + 'Section').classList.add('active');
+      const targetSection = document.getElementById(tabName + 'Section');
+      if (targetSection) targetSection.classList.add('active');
 
       document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(button => {
         button.classList.add('active');
       });
     }
 
-    /*
-      เรียกข้อมูลจาก Apps Script แบบ JSONP
-    */
     function apiGet(action, parameters = {}) {
       return new Promise((resolve, reject) => {
-        const callbackName =
-          'jsonp_' + Date.now() + '_' + Math.random().toString(36).substring(2, 12);
-
+        const callbackName = 'jsonp_' + Date.now() + '_' + Math.random().toString(36).substring(2, 12);
         const script = document.createElement('script');
-        const params = new URLSearchParams({
-          action: action,
-          callback: callbackName,
-          ...parameters
-        });
+        const params = new URLSearchParams({ action: action, callback: callbackName, ...parameters });
 
         const timeout = setTimeout(() => {
           cleanup();
-          reject(new Error('การเชื่อมต่อใช้เวลานานเกินไป กรุณาลองใหม่อีกครั้ง'));
+          reject(new Error('การเชื่อมต่อกับเซิร์ฟเวอร์ใช้เวลานานเกินไป'));
         }, 20000);
 
         window[callbackName] = function(response) {
@@ -846,10 +537,7 @@
         function cleanup() {
           clearTimeout(timeout);
           delete window[callbackName];
-
-          if (script.parentNode) {
-            script.parentNode.removeChild(script);
-          }
+          if (script.parentNode) script.parentNode.removeChild(script);
         }
 
         script.onerror = function() {
@@ -862,10 +550,6 @@
       });
     }
 
-    /*
-      ส่งข้อมูลไป Apps Script แบบ POST ผ่าน hidden iframe
-      ใช้แนวทางเดียวกับ index.html
-    */
     function apiPost(payload) {
       return new Promise((resolve, reject) => {
         const form = document.createElement('form');
@@ -882,182 +566,93 @@
 
         form.appendChild(input);
         document.body.appendChild(form);
-
         form.submit();
         form.remove();
 
-        waitForRequestResult(payload.requestId)
-          .then(resolve)
-          .catch(reject);
+        waitForRequestResult(payload.requestId).then(resolve).catch(reject);
       });
     }
 
     async function waitForRequestResult(requestId) {
-      const maxAttempts = 25;
-
-      for (let i = 0; i < maxAttempts; i++) {
+      for (let i = 0; i < 25; i++) {
         await sleep(700);
-
-        const response = await apiGet('requestStatus', {
-          idToken: idToken,
-          requestId: requestId
-        });
-
-        if (!response || !response.success) {
-          throw new Error(
-            response && response.message
-              ? response.message
-              : 'ไม่สามารถตรวจสอบผลการบันทึกได้'
-          );
-        }
-
+        const response = await apiGet('requestStatus', { idToken: idToken, requestId: requestId });
+        if (!response || !response.success) throw new Error(response.message || 'ตรวจสอบสถานะไม่สำเร็จ');
         const result = response.data;
-
-        if (result.status === 'SUCCESS') {
-          return result.result || {};
-        }
-
-        if (result.status === 'ERROR') {
-          throw new Error(result.message || 'ไม่สามารถบันทึกข้อมูลได้');
-        }
+        if (result.status === 'SUCCESS') return result.result || {};
+        if (result.status === 'ERROR') throw new Error(result.message || 'บันทึกข้อมูลไม่สำเร็จ');
       }
-
-      throw new Error('ระบบใช้เวลาประมวลผลนานเกินไป กรุณาลองใหม่');
+      throw new Error('ระบบใช้เวลาประมวลผลนานเกินไป');
     }
 
     async function loadLoans() {
       if (!idToken) return;
-
       setLoanLoading(true);
-
       try {
-        const response = await apiGet('staffLoans', {
-          idToken: idToken
-        });
-
-        if (!response || !response.success) {
-          throw new Error(response && response.message ? response.message : 'โหลดรายการยืมไม่สำเร็จ');
-        }
-
+        const response = await apiGet('staffLoans', { idToken: idToken });
+        if (!response || !response.success) throw new Error(response.message || 'โหลดรายการไม่สำเร็จ');
         allLoans = response.data || [];
         renderLoans(allLoans);
-
       } catch (error) {
         setLoanLoading(false);
-
-        Swal.fire({
-          icon: 'error',
-          title: 'โหลดข้อมูลไม่สำเร็จ',
-          text: error.message,
-          confirmButtonText: 'ตกลง'
-        });
+        Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: error.message });
       }
     }
 
     async function loadEquipment() {
       if (!idToken) return;
-
       setEquipmentLoading(true);
-
       try {
-        const response = await apiGet('staffEquipment', {
-          idToken: idToken
-        });
-
-        if (!response || !response.success) {
-          throw new Error(response && response.message ? response.message : 'โหลดข้อมูลอุปกรณ์ไม่สำเร็จ');
-        }
-
+        const response = await apiGet('staffEquipment', { idToken: idToken });
+        if (!response || !response.success) throw new Error(response.message || 'โหลดข้อมูลไม่สำเร็จ');
         allEquipment = response.data || [];
         renderEquipment(allEquipment);
-
       } catch (error) {
         setEquipmentLoading(false);
-
-        Swal.fire({
-          icon: 'error',
-          title: 'โหลดข้อมูลไม่สำเร็จ',
-          text: error.message,
-          confirmButtonText: 'ตกลง'
-        });
+        Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: error.message });
       }
     }
 
     function renderLoans(loans) {
       const list = document.getElementById('loanList');
       const empty = document.getElementById('loanEmpty');
-
       setLoanLoading(false);
       list.innerHTML = '';
+      document.getElementById('loanCount').textContent = `พบ ${loans.length} รายการที่กำลังยืม`;
 
-      document.getElementById('loanCount').textContent =
-        `พบ ${loans.length} รายการที่กำลังยืม`;
-
-      if (!loans.length) {
-        empty.style.display = 'block';
-        return;
-      }
-
+      if (!loans.length) { empty.style.display = 'block'; return; }
       empty.style.display = 'none';
 
       loans.forEach(loan => {
         const image = loan.imageUrl
-          ? `
-            <img
-              class="item-image"
-              src="${escapeAttribute(loan.imageUrl)}"
-              alt="${escapeAttribute(loan.equipmentName)}"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='grid';"
-            >
-            <div class="item-icon" style="display:none;">💻</div>
-          `
+          ? `<img class="item-image" src="${escapeAttribute(loan.imageUrl)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='grid';"><div class="item-icon" style="display:none;">💻</div>`
           : `<div class="item-icon">💻</div>`;
 
         const card = document.createElement('article');
         card.className = 'item-card';
-
         card.innerHTML = `
           <div class="item-top">
             ${image}
             <div class="item-title">
-              <h3>${escapeHtml(loan.equipmentName || 'ไม่ระบุชื่ออุปกรณ์')}</h3>
+              <h3>${escapeHtml(loan.equipmentName || '-')}</h3>
               <div class="item-id">${escapeHtml(loan.equipmentId || '-')}</div>
             </div>
             <span class="badge borrowed">กำลังยืม</span>
           </div>
-
           <div class="details">
-            <div class="row">
-              <span>ผู้ยืม</span>
-              <span>${escapeHtml(loan.borrowerName || '-')}</span>
-            </div>
-            <div class="row">
-              <span>วันที่ยืม</span>
-              <span>${escapeHtml(formatDate(loan.borrowedAt))}</span>
-            </div>
-            <div class="row">
-              <span>กำหนดคืน</span>
-              <span style="font-weight:500;color:#2563eb;">${escapeHtml(formatDate(loan.dueDate))}</span>
-            </div>
-            <div class="row">
-              <span>วัตถุประสงค์</span>
-              <span>${escapeHtml(loan.purpose || '-')}</span>
-            </div>
+            <div class="row"><span>ผู้ยืม</span><span>${escapeHtml(loan.borrowerName || '-')}</span></div>
+            <div class="row"><span>วันที่ยืม</span><span>${escapeHtml(formatDate(loan.borrowedAt))}</span></div>
+            <div class="row"><span>กำหนดคืน</span><span style="font-weight:500;color:#2563eb;">${escapeHtml(formatDate(loan.dueDate))}</span></div>
+            <div class="row"><span>วัตถุประสงค์</span><span>${escapeHtml(loan.purpose || '-')}</span></div>
           </div>
-
           <div class="card-actions">
-            <button
-              class="btn btn-success return-btn"
+            <button class="btn btn-success return-btn"
               data-loan-id="${escapeAttribute(loan.loanId)}"
               data-equipment-id="${escapeAttribute(loan.equipmentId)}"
               data-equipment-name="${escapeAttribute(loan.equipmentName)}"
-              data-borrower-name="${escapeAttribute(loan.borrowerName)}"
-            >
-              ✓ รับคืนอุปกรณ์
-            </button>
+              data-borrower-name="${escapeAttribute(loan.borrowerName)}">✓ รับคืนอุปกรณ์</button>
           </div>
         `;
-
         list.appendChild(card);
       });
 
@@ -1075,64 +670,29 @@
 
     function filterLoans() {
       const keyword = document.getElementById('loanSearch').value.trim().toLowerCase();
-
-      const filtered = allLoans.filter(loan => {
-        const content = [
-          loan.equipmentId,
-          loan.equipmentName,
-          loan.borrowerName,
-          loan.purpose,
-          loan.category
-        ].join(' ').toLowerCase();
-
-        return content.includes(keyword);
-      });
-
+      const filtered = allLoans.filter(l => [l.equipmentId, l.equipmentName, l.borrowerName, l.purpose].join(' ').toLowerCase().includes(keyword));
       renderLoans(filtered);
     }
 
     async function openReturnModal(loan) {
       const result = await Swal.fire({
         title: 'ยืนยันรับคืนอุปกรณ์',
-        html: `
-          <div style="text-align:left;font-size:13px;line-height:1.8;">
-            <div><strong>อุปกรณ์:</strong> ${escapeHtml(loan.equipmentName)}</div>
-            <div><strong>รหัสอุปกรณ์:</strong> ${escapeHtml(loan.equipmentId)}</div>
-            <div><strong>ผู้ยืม:</strong> ${escapeHtml(loan.borrowerName)}</div>
-          </div>
-        `,
+        html: `<div style="text-align:left;font-size:13px;line-height:1.8;"><div><strong>อุปกรณ์:</strong> ${escapeHtml(loan.equipmentName)}</div><div><strong>ผู้ยืม:</strong> ${escapeHtml(loan.borrowerName)}</div></div>`,
         input: 'textarea',
         inputLabel: 'หมายเหตุการคืน / สภาพอุปกรณ์',
         inputValue: 'ปกติ สมบูรณ์ดี',
-        inputPlaceholder: 'เช่น ปกติ สมบูรณ์ดี',
         showCancelButton: true,
         confirmButtonText: 'ยืนยันรับคืน',
         cancelButtonText: 'ยกเลิก',
         confirmButtonColor: '#059669',
-        inputValidator: value => {
-          if (!value || !value.trim()) {
-            return 'กรุณาระบุสภาพหรือหมายเหตุการคืน';
-          }
-        }
+        inputValidator: val => !val || !val.trim() ? 'กรุณาระบุสภาพหรือหมายเหตุการคืน' : null
       });
-
       if (!result.isConfirmed) return;
-
-      await submitReturn(
-        loan.loanId,
-        loan.equipmentId,
-        result.value.trim()
-      );
+      await submitReturn(loan.loanId, loan.equipmentId, result.value.trim());
     }
 
     async function submitReturn(loanId, equipmentId, returnNote) {
-      Swal.fire({
-        title: 'กำลังบันทึกการรับคืน...',
-        text: 'กรุณารอสักครู่',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
-
+      Swal.fire({ title: 'กำลังบันทึกการรับคืน...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
       try {
         const result = await apiPost({
           action: 'returnEquipment',
@@ -1142,246 +702,110 @@
           equipmentId: equipmentId,
           returnNote: returnNote
         });
-
-        await Promise.all([
-          loadLoans(),
-          loadEquipment()
-        ]);
-
-        Swal.fire({
-          icon: 'success',
-          title: 'รับคืนอุปกรณ์สำเร็จ',
-          text: result.message || 'บันทึกข้อมูลเรียบร้อยแล้ว',
-          confirmButtonText: 'ตกลง'
-        });
-
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'บันทึกไม่สำเร็จ',
-          text: error.message || 'เกิดข้อผิดพลาดในการรับคืนอุปกรณ์',
-          confirmButtonText: 'ตกลง'
-        });
+        await Promise.all([loadLoans(), loadEquipment()]);
+        Swal.fire({ icon: 'success', title: 'สำเร็จ', text: result.message || 'บันทึกข้อมูลเรียบร้อย' });
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'ไม่สำเร็จ', text: err.message });
       }
     }
 
-    function renderEquipment(equipmentList) {
+    function renderEquipment(eqList) {
       const list = document.getElementById('equipmentList');
       const empty = document.getElementById('equipmentEmpty');
-
       setEquipmentLoading(false);
       list.innerHTML = '';
+      document.getElementById('equipmentCount').textContent = `พบอุปกรณ์ทั้งหมด ${eqList.length} รายการ`;
 
-      document.getElementById('equipmentCount').textContent =
-        `พบอุปกรณ์ทั้งหมด ${equipmentList.length} รายการ`;
-
-      if (!equipmentList.length) {
-        empty.style.display = 'block';
-        return;
-      }
-
+      if (!eqList.length) { empty.style.display = 'block'; return; }
       empty.style.display = 'none';
 
-      equipmentList.forEach(item => {
+      eqList.forEach(item => {
         const image = item.imageUrl
-          ? `
-            <img
-              class="item-image"
-              src="${escapeAttribute(item.imageUrl)}"
-              alt="${escapeAttribute(item.equipmentName)}"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='grid';"
-            >
-            <div class="item-icon" style="display:none;">📦</div>
-          `
+          ? `<img class="item-image" src="${escapeAttribute(item.imageUrl)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='grid';"><div class="item-icon" style="display:none;">📦</div>`
           : `<div class="item-icon">📦</div>`;
 
         const card = document.createElement('article');
         card.className = 'item-card';
-
         card.innerHTML = `
           <div class="item-top">
             ${image}
             <div class="item-title">
-              <h3>${escapeHtml(item.equipmentName || 'ไม่ระบุชื่ออุปกรณ์')}</h3>
+              <h3>${escapeHtml(item.equipmentName || '-')}</h3>
               <div class="item-id">${escapeHtml(item.equipmentId || '-')}</div>
             </div>
-            <span class="badge ${getStatusClass(item.status)}">
-              ${escapeHtml(getStatusName(item.status))}
-            </span>
+            <span class="badge ${getStatusClass(item.status)}">${escapeHtml(getStatusName(item.status))}</span>
           </div>
-
           <div class="info-grid">
-            <div class="info">
-              <label>หมวดหมู่</label>
-              <span>${escapeHtml(item.category || '-')}</span>
-            </div>
-            <div class="info">
-              <label>สถานที่</label>
-              <span>${escapeHtml(item.location || '-')}</span>
-            </div>
-            <div class="info full">
-              <label>หมายเหตุ</label>
-              <span>${escapeHtml(item.note || '-')}</span>
-            </div>
+            <div class="info"><label>หมวดหมู่</label><span>${escapeHtml(item.category || '-')}</span></div>
+            <div class="info"><label>สถานที่</label><span>${escapeHtml(item.location || '-')}</span></div>
+            <div class="info full"><label>หมายเหตุ</label><span>${escapeHtml(item.note || '-')}</span></div>
           </div>
-
           <div class="card-actions">
-            <button class="btn btn-outline edit-equipment" data-id="${escapeAttribute(item.equipmentId)}">
-              ✏️ แก้ไข
-            </button>
-            <button
-              class="btn btn-danger delete-equipment"
-              data-id="${escapeAttribute(item.equipmentId)}"
-              data-name="${escapeAttribute(item.equipmentName)}"
-            >
-              🗑️ ลบ
-            </button>
+            <button class="btn btn-outline edit-eq" data-id="${escapeAttribute(item.equipmentId)}">✏️ แก้ไข</button>
+            <button class="btn btn-danger delete-eq" data-id="${escapeAttribute(item.equipmentId)}" data-name="${escapeAttribute(item.equipmentName)}">🗑️ ลบ</button>
           </div>
         `;
-
         list.appendChild(card);
       });
 
-      document.querySelectorAll('.edit-equipment').forEach(button => {
-        button.addEventListener('click', () => {
-          const item = allEquipment.find(eq => eq.equipmentId === button.dataset.id);
+      document.querySelectorAll('.edit-eq').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const item = allEquipment.find(e => e.equipmentId === btn.dataset.id);
           if (item) openEquipmentModal(item);
         });
       });
 
-      document.querySelectorAll('.delete-equipment').forEach(button => {
-        button.addEventListener('click', () => {
-          deleteEquipment(button.dataset.id, button.dataset.name);
-        });
+      document.querySelectorAll('.delete-eq').forEach(btn => {
+        btn.addEventListener('click', () => deleteEquipment(btn.dataset.id, btn.dataset.name));
       });
     }
 
     function filterEquipment() {
       const keyword = document.getElementById('equipmentSearch').value.trim().toLowerCase();
-
-      const filtered = allEquipment.filter(item => {
-        const content = [
-          item.equipmentId,
-          item.equipmentName,
-          item.category,
-          item.location,
-          item.status,
-          item.note
-        ].join(' ').toLowerCase();
-
-        return content.includes(keyword);
-      });
-
+      const filtered = allEquipment.filter(e => [e.equipmentId, e.equipmentName, e.category, e.location].join(' ').toLowerCase().includes(keyword));
       renderEquipment(filtered);
     }
 
     async function openEquipmentModal(item = null) {
       const isEdit = Boolean(item);
-
       const { value: values } = await Swal.fire({
         title: isEdit ? 'แก้ไขข้อมูลอุปกรณ์' : 'เพิ่มอุปกรณ์ใหม่',
         width: 620,
         html: `
           <div style="display:grid;gap:11px;text-align:left;font-size:12px;">
-            <div>
-              <label style="display:block;margin-bottom:4px;">รหัสอุปกรณ์ *</label>
-              <input
-                id="eqId"
-                class="swal2-input"
-                style="width:100%;margin:0;"
-                value="${escapeAttribute(item ? item.equipmentId : '')}"
-                placeholder="เช่น NB-001"
-                ${isEdit ? 'readonly' : ''}
-              >
-            </div>
-
-            <div>
-              <label style="display:block;margin-bottom:4px;">ชื่ออุปกรณ์ *</label>
-              <input
-                id="eqName"
-                class="swal2-input"
-                style="width:100%;margin:0;"
-                value="${escapeAttribute(item ? item.equipmentName : '')}"
-                placeholder="เช่น Notebook Dell Latitude"
-              >
-            </div>
-
+            <div><label style="display:block;margin-bottom:4px;">รหัสอุปกรณ์ *</label>
+              <input id="eqId" class="swal2-input" style="width:100%;margin:0;" value="${escapeAttribute(item ? item.equipmentId : '')}" placeholder="เช่น NB-001" ${isEdit ? 'readonly' : ''}></div>
+            <div><label style="display:block;margin-bottom:4px;">ชื่ออุปกรณ์ *</label>
+              <input id="eqName" class="swal2-input" style="width:100%;margin:0;" value="${escapeAttribute(item ? item.equipmentName : '')}" placeholder="เช่น Notebook"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div>
-                <label style="display:block;margin-bottom:4px;">หมวดหมู่</label>
-                <input
-                  id="eqCategory"
-                  class="swal2-input"
-                  style="width:100%;margin:0;"
-                  value="${escapeAttribute(item ? item.category : '')}"
-                  placeholder="เช่น Notebook"
-                >
-              </div>
-
-              <div>
-                <label style="display:block;margin-bottom:4px;">สถานที่</label>
-                <input
-                  id="eqLocation"
-                  class="swal2-input"
-                  style="width:100%;margin:0;"
-                  value="${escapeAttribute(item ? item.location : '')}"
-                  placeholder="เช่น ห้อง IT"
-                >
-              </div>
+              <div><label style="display:block;margin-bottom:4px;">หมวดหมู่</label>
+                <input id="eqCategory" class="swal2-input" style="width:100%;margin:0;" value="${escapeAttribute(item ? item.category : '')}"></div>
+              <div><label style="display:block;margin-bottom:4px;">สถานที่</label>
+                <input id="eqLocation" class="swal2-input" style="width:100%;margin:0;" value="${escapeAttribute(item ? item.location : '')}"></div>
             </div>
-
-            <div>
-              <label style="display:block;margin-bottom:4px;">URL รูปภาพ</label>
-              <input
-                id="eqImageUrl"
-                class="swal2-input"
-                style="width:100%;margin:0;"
-                value="${escapeAttribute(item ? item.imageUrl : '')}"
-                placeholder="https://..."
-              >
-            </div>
-
-            <div>
-              <label style="display:block;margin-bottom:4px;">สถานะ *</label>
+            <div><label style="display:block;margin-bottom:4px;">URL รูปภาพ</label>
+              <input id="eqImageUrl" class="swal2-input" style="width:100%;margin:0;" value="${escapeAttribute(item ? item.imageUrl : '')}"></div>
+            <div><label style="display:block;margin-bottom:4px;">สถานะ *</label>
               <select id="eqStatus" class="swal2-select" style="width:100%;margin:0;">
                 <option value="AVAILABLE">พร้อมให้ยืม</option>
                 <option value="BORROWED">กำลังถูกยืม</option>
                 <option value="MAINTENANCE">อยู่ระหว่างซ่อม</option>
                 <option value="INACTIVE">ปิดใช้งาน</option>
-              </select>
-            </div>
-
-            <div>
-              <label style="display:block;margin-bottom:4px;">หมายเหตุ</label>
-              <textarea
-                id="eqNote"
-                class="swal2-textarea"
-                style="width:100%;height:78px;margin:0;"
-                placeholder="รายละเอียดเพิ่มเติม"
-              >${escapeHtml(item ? item.note : '')}</textarea>
-            </div>
+              </select></div>
+            <div><label style="display:block;margin-bottom:4px;">หมายเหตุ</label>
+              <textarea id="eqNote" class="swal2-textarea" style="width:100%;height:78px;margin:0;">${escapeHtml(item ? item.note : '')}</textarea></div>
           </div>
         `,
-        didOpen: () => {
-          document.getElementById('eqStatus').value =
-            item && item.status ? item.status : 'AVAILABLE';
-        },
+        didOpen: () => { document.getElementById('eqStatus').value = item && item.status ? item.status : 'AVAILABLE'; },
         showCancelButton: true,
-        confirmButtonText: isEdit ? 'บันทึกการแก้ไข' : 'เพิ่มอุปกรณ์',
+        confirmButtonText: isEdit ? 'บันทึก' : 'เพิ่ม',
         cancelButtonText: 'ยกเลิก',
-        confirmButtonColor: '#2563eb',
         preConfirm: () => {
           const equipmentId = document.getElementById('eqId').value.trim();
           const equipmentName = document.getElementById('eqName').value.trim();
-
-          if (!equipmentId || !equipmentName) {
-            Swal.showValidationMessage('กรุณากรอกรหัสอุปกรณ์และชื่ออุปกรณ์');
-            return false;
-          }
-
+          if (!equipmentId || !equipmentName) { Swal.showValidationMessage('กรุณากรอกรหัสและชื่ออุปกรณ์'); return false; }
           return {
-            equipmentId: equipmentId,
-            equipmentName: equipmentName,
+            equipmentId, equipmentName,
             category: document.getElementById('eqCategory').value.trim(),
             location: document.getElementById('eqLocation').value.trim(),
             imageUrl: document.getElementById('eqImageUrl').value.trim(),
@@ -1390,185 +814,74 @@
           };
         }
       });
-
       if (!values) return;
       await saveEquipment(values);
     }
 
     async function saveEquipment(values) {
-      Swal.fire({
-        title: 'กำลังบันทึกข้อมูล...',
-        text: 'กรุณารอสักครู่',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
-
+      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
       try {
-        const result = await apiPost({
-          action: 'saveEquipment',
-          requestId: createRequestId(),
-          idToken: idToken,
-          equipmentId: values.equipmentId,
-          equipmentName: values.equipmentName,
-          category: values.category,
-          location: values.location,
-          imageUrl: values.imageUrl,
-          status: values.status,
-          note: values.note
-        });
-
+        const result = await apiPost({ action: 'saveEquipment', requestId: createRequestId(), idToken: idToken, ...values });
         await loadEquipment();
-
-        Swal.fire({
-          icon: 'success',
-          title: 'บันทึกสำเร็จ',
-          text: result.message || 'บันทึกข้อมูลอุปกรณ์เรียบร้อยแล้ว',
-          confirmButtonText: 'ตกลง'
-        });
-
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'บันทึกไม่สำเร็จ',
-          text: error.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล',
-          confirmButtonText: 'ตกลง'
-        });
+        Swal.fire({ icon: 'success', title: 'สำเร็จ', text: result.message || 'บันทึกเรียบร้อย' });
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'ไม่สำเร็จ', text: err.message });
       }
     }
 
     async function deleteEquipment(equipmentId, equipmentName) {
       const confirm = await Swal.fire({
-        icon: 'warning',
-        title: 'ยืนยันการลบอุปกรณ์',
-        html: `
-          ต้องการลบ <strong>${escapeHtml(equipmentName || equipmentId)}</strong>
-          <br>
-          <span style="font-size:12px;color:#64748b;">เมื่อลบแล้วจะไม่สามารถกู้คืนได้</span>
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'ลบอุปกรณ์',
-        cancelButtonText: 'ยกเลิก',
-        confirmButtonColor: '#dc2626'
+        icon: 'warning', title: 'ยืนยันการลบ',
+        text: `ต้องการลบ ${equipmentName || equipmentId} ใช่หรือไม่?`,
+        showCancelButton: true, confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#dc2626'
       });
-
       if (!confirm.isConfirmed) return;
-
-      Swal.fire({
-        title: 'กำลังลบข้อมูล...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
-
+      Swal.fire({ title: 'กำลังลบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
       try {
-        const result = await apiPost({
-          action: 'deleteEquipment',
-          requestId: createRequestId(),
-          idToken: idToken,
-          equipmentId: equipmentId
-        });
-
+        const result = await apiPost({ action: 'deleteEquipment', requestId: createRequestId(), idToken: idToken, equipmentId: equipmentId });
         await loadEquipment();
-
-        Swal.fire({
-          icon: 'success',
-          title: 'ลบสำเร็จ',
-          text: result.message || 'ลบข้อมูลอุปกรณ์เรียบร้อยแล้ว',
-          confirmButtonText: 'ตกลง'
-        });
-
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'ลบไม่สำเร็จ',
-          text: error.message || 'ไม่สามารถลบอุปกรณ์ได้',
-          confirmButtonText: 'ตกลง'
-        });
+        Swal.fire({ icon: 'success', title: 'สำเร็จ', text: result.message || 'ลบเรียบร้อย' });
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'ไม่สำเร็จ', text: err.message });
       }
     }
 
     function setLoanLoading(show) {
       document.getElementById('loanLoading').style.display = show ? 'block' : 'none';
-
-      if (show) {
-        document.getElementById('loanEmpty').style.display = 'none';
-        document.getElementById('loanList').innerHTML = '';
-      }
+      if (show) { document.getElementById('loanEmpty').style.display = 'none'; document.getElementById('loanList').innerHTML = ''; }
     }
 
     function setEquipmentLoading(show) {
       document.getElementById('equipmentLoading').style.display = show ? 'block' : 'none';
-
-      if (show) {
-        document.getElementById('equipmentEmpty').style.display = 'none';
-        document.getElementById('equipmentList').innerHTML = '';
-      }
+      if (show) { document.getElementById('equipmentEmpty').style.display = 'none'; document.getElementById('equipmentList').innerHTML = ''; }
     }
 
     function getStatusName(status) {
-      const statusMap = {
-        AVAILABLE: 'พร้อมให้ยืม',
-        BORROWED: 'กำลังถูกยืม',
-        MAINTENANCE: 'อยู่ระหว่างซ่อม',
-        INACTIVE: 'ปิดใช้งาน'
-      };
-
-      return statusMap[status] || status || '-';
+      return { AVAILABLE: 'พร้อมให้ยืม', BORROWED: 'กำลังถูกยืม', MAINTENANCE: 'อยู่ระหว่างซ่อม', INACTIVE: 'ปิดใช้งาน' }[status] || status || '-';
     }
 
     function getStatusClass(status) {
-      const classMap = {
-        AVAILABLE: 'available',
-        BORROWED: 'borrowed',
-        MAINTENANCE: 'maintenance',
-        INACTIVE: 'inactive'
-      };
-
-      return classMap[status] || 'inactive';
+      return { AVAILABLE: 'available', BORROWED: 'borrowed', MAINTENANCE: 'maintenance', INACTIVE: 'inactive' }[status] || 'inactive';
     }
 
     function createRequestId() {
-      return 'REQ_' + Date.now() + '_' +
-        Math.random().toString(36).substring(2, 12);
+      return 'REQ_' + Date.now() + '_' + Math.random().toString(36).substring(2, 12);
     }
 
-    function sleep(milliseconds) {
-      return new Promise(resolve => setTimeout(resolve, milliseconds));
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function formatDate(val) {
+      if (!val) return '-';
+      const d = new Date(val);
+      return isNaN(d.getTime()) ? String(val) : d.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
-    function formatDate(value) {
-      if (!value) return '-';
-
-      try {
-        const date = new Date(value);
-
-        if (Number.isNaN(date.getTime())) {
-          return String(value);
-        }
-
-        return date.toLocaleDateString('th-TH', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        });
-      } catch (error) {
-        return String(value);
-      }
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
-    function escapeHtml(value) {
-      if (value === null || value === undefined) return '';
-
-      return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    function escapeAttribute(value) {
-      return escapeHtml(value).replace(/`/g, '&#096;');
-    }
+    function escapeAttribute(str) { return escapeHtml(str).replace(/`/g, '&#096;'); }
   </script>
 </body>
 </html>
