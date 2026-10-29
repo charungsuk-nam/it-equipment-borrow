@@ -492,7 +492,7 @@
       }
     }
 
-    // ฟังก์ชันดึงข้อมูลรายการยืมของฉันจาก Backend (พร้อมจัดรูปแบบวันที่ให้แสดงผลเสถียรทั้งมือถือและคอม)
+        // ฟังก์ชันดึงข้อมูลรายการยืมของฉันจาก Backend (จัดรูปแบบวันที่และเวลาให้สวยงามอ่านง่าย)
     async function loadMyLoans() {
       const container = document.getElementById('myLoansList');
       container.innerHTML = '<div style="text-align: center; color: #777; padding: 40px; background: #fff; border-radius: 12px;">กำลังโหลดข้อมูล...</div>';
@@ -508,32 +508,52 @@
 
         container.innerHTML = '';
         result.forEach(loan => {
-          const isBorrowed = loan.status === 'กำลังยืม';
+          const isBorrowed = String(loan.status).toUpperCase() === 'BORROWED' || loan.status === 'กำลังยืม';
+          const badgeText = isBorrowed ? 'กำลังยืม' : loan.status;
           const badgeStyle = isBorrowed 
             ? 'background: #e3f2fd; color: #1565c0;' 
             : 'background: #e8f5e9; color: #2e7d32;';
 
-          const formatDateStr = (dateStr) => {
+          // ฟังก์ชันแปลงวันที่และเวลาแบบสมบูรณ์ รองรับ ISO string
+          const formatDateTimeStr = (dateStr) => {
             if (!dateStr) return '-';
-            const cleanDate = String(dateStr).split('T')[0];
-            const parts = cleanDate.split('-');
-            if (parts.length === 3) {
-              return `${parts[2]}/${parts[1]}/${Number(parts[0]) + 543}`;
+            try {
+              const dateObj = new Date(dateStr);
+              if (isNaN(dateObj.getTime())) {
+                // ถ้าไม่ใช่ Date object ให้ตัดสตริงตรงๆ
+                const cleanDate = String(dateStr).split('T')[0];
+                const parts = cleanDate.split('-');
+                if (parts.length === 3) {
+                  return `${parts[2]}/${parts[1]}/${Number(parts[0]) + 543}`;
+                }
+                return dateStr;
+              }
+              
+              // แปลงเป็นเวลาไทย (+7)
+              const day = String(dateObj.getDate()).padStart(2, '0');
+              const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+              const year = dateObj.getFullYear() + 543;
+              const hours = String(dateObj.getHours()).padStart(2, '0');
+              const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+              
+              // หากมีค่าเวลาเป็น 00:00 หรือไม่มีการเก็บเวลาเจาะจง จะแสดงเฉพาะวันที่ก็ได้ แต่ถ้ามีเวลาให้แสดงเวลาด้วย
+              return `${day}/${month}/${year} ${hours}:${minutes} น.`;
+            } catch (e) {
+              return dateStr;
             }
-            return dateStr;
           };
           
           const card = document.createElement('div');
-          card.style.cssText = 'background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; gap: 10px;';
+          card.style.cssText = 'background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;';
           card.innerHTML = `
             <div style="flex: 1;">
-              <h4 style="margin: 0 0 6px 0; color: #333; font-size: 16px;">${escapeHtml(loan.equipmentName)} <span style="font-size: 13px; color: #666; font-weight: normal;">(${escapeHtml(loan.equipmentId)})</span></h4>
-              <div style="font-size: 13px; color: #555; margin-bottom: 3px;">📅 วันที่ยืม: ${escapeHtml(formatDateStr(loan.borrowedAt))}</div>
-              <div style="font-size: 13px; color: #555; margin-bottom: 3px;">⏳ กำหนดคืน: ${escapeHtml(formatDateStr(loan.dueDate))}</div>
+              <h4 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">${escapeHtml(loan.equipmentName)} <span style="font-size: 13px; color: #666; font-weight: normal;">(${escapeHtml(loan.equipmentId)})</span></h4>
+              <div style="font-size: 13px; color: #555; margin-bottom: 4px;">📅 วันที่ยืม: ${escapeHtml(formatDateTimeStr(loan.borrowedAt))}</div>
+              <div style="font-size: 13px; color: #555; margin-bottom: 4px;">⏳ กำหนดคืน: ${escapeHtml(formatDateTimeStr(loan.dueDate))}</div>
               <div style="font-size: 13px; color: #555;">📝 วัตถุประสงค์: ${escapeHtml(loan.purpose || '-')}</div>
             </div>
             <div>
-              <span style="padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; white-space: nowrap; ${badgeStyle}">${escapeHtml(loan.status)}</span>
+              <span style="padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; white-space: nowrap; ${badgeStyle}">${escapeHtml(badgeText)}</span>
             </div>
           `;
           container.appendChild(card);
