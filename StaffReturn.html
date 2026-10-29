@@ -410,28 +410,48 @@
 
     document.addEventListener('DOMContentLoaded', initSystem);
 
+    function getLineUserIdFromToken(token) {
+      try {
+        const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        const json = decodeURIComponent(
+          atob(payload).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(json).sub || '';
+      } catch (e) {
+        return '';
+      }
+    }
+
     async function initSystem() {
-      // ผูกเมนูก่อนทันที เพื่อให้กดสลับ Tab ได้แม้กำลังโหลด
       bindEvents();
+
+      const debug = { version: 'v3', liffId: CONFIG.LIFF_ID, step: 'start' };
 
       try {
         if (!CONFIG.LIFF_ID || CONFIG.LIFF_ID.includes('ใส่_LIFF_ID')) {
           throw new Error('กรุณากำหนด LIFF_ID ให้ถูกต้องก่อนใช้งาน');
         }
 
+        debug.step = 'liff.init';
         await liff.init({ liffId: CONFIG.LIFF_ID });
+
+        debug.inClient = liff.isInClient();
+        debug.loggedIn = liff.isLoggedIn();
 
         if (!liff.isLoggedIn()) {
           liff.login();
           return;
         }
 
+        debug.step = 'getIDToken';
         idToken = liff.getIDToken();
+        debug.hasToken = Boolean(idToken);
 
         if (!idToken) {
-          throw new Error('ไม่พบ LINE ID Token กรุณาเปิดหน้านี้ผ่านลิงก์ LIFF');
+          throw new Error('ไม่พบ LINE ID Token (ตรวจว่า LIFF App เปิด Scope openid แล้ว)');
         }
 
+        debug.step = 'staffBootstrap';
         const response = await apiGet('staffBootstrap', { idToken: idToken });
 
         if (!response || !response.success) {
@@ -456,11 +476,7 @@
       } catch (error) {
         console.error(error);
 
-        let lineUserId = '';
-        try {
-          const decoded = liff.getDecodedIDToken();
-          lineUserId = decoded && decoded.sub ? decoded.sub : '';
-        } catch (e) {}
+        const userId = idToken ? getLineUserIdFromToken(idToken) : '';
 
         document.getElementById('staffName').textContent = 'เข้าใช้งานไม่ได้';
         document.getElementById('staffRole').textContent = 'ตรวจสอบสิทธิ์ไม่สำเร็จ';
@@ -469,9 +485,15 @@
 
         const detail = `
           <div style="margin-top:8px;color:#dc2626;">${escapeHtml(error.message || 'เกิดข้อผิดพลาด')}</div>
-          ${lineUserId ? `<div style="margin-top:12px;font-size:11px;color:#64748b;">
-            LINE User ID ของคุณ:<br><code style="word-break:break-all;">${escapeHtml(lineUserId)}</code>
-          </div>` : ''}
+          <div style="margin-top:12px;font-size:11px;color:#64748b;text-align:left;line-height:1.7;">
+            <div>LINE User ID: <code style="word-break:break-all;">${escapeHtml(userId || 'อ่านไม่ได้')}</code></div>
+            <div>เวอร์ชันหน้า: ${escapeHtml(debug.version)}</div>
+            <div>LIFF ID: ${escapeHtml(debug.liffId)}</div>
+            <div>ขั้นตอนที่หยุด: ${escapeHtml(debug.step)}</div>
+            <div>เปิดในแอป LINE: ${escapeHtml(String(debug.inClient))}</div>
+            <div>ล็อกอินแล้ว: ${escapeHtml(String(debug.loggedIn))}</div>
+            <div>มี ID Token: ${escapeHtml(String(debug.hasToken))}</div>
+          </div>
         `;
 
         document.getElementById('loanList').innerHTML =
@@ -481,8 +503,7 @@
           icon: 'error',
           title: 'ไม่อนุญาตให้เข้าใช้งาน',
           html: detail,
-          confirmButtonText: 'รับทราบ',
-          confirmButtonColor: '#dc2626'
+          confirmButtonText: 'รับทราบ'
         });
       }
     }
