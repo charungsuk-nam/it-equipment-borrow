@@ -430,6 +430,12 @@
         document.getElementById('userName').textContent = 'ไม่สามารถเข้าสู่ระบบได้';
         document.getElementById('userDetail').textContent = 'กรุณาเปิดผ่าน LINE Official Account';
       }
+      
+      const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('tab') === 'status') {
+          switchTab('status');
+      }
+
     }
 
     // ฟังก์ชันสลับหน้าจอระหว่าง ยืมอุปกรณ์ กับ รายการของฉัน
