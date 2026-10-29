@@ -3,119 +3,272 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบหลังบ้าน - ยืมคืนอุปกรณ์ IT V.1</title>
+  <title>ระบบหลังบ้าน - ยืมคืนอุปกรณ์ IT</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
   <style>
-      /* --- ตั้งค่าระบบ Responsive พื้นฐาน ป้องกันการล้นขอบจอ --- */
-  * {
-    box-sizing: border-box;
-    max-width: 100%;
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    font-family: sans-serif;
-    background-color: #f4f6f9;
-  }
-
-  .main {
-    width: 100%;
-    padding: 12px;
-  }
-
-  /* คอนเทนเนอร์และกริดหลักให้ปรับเต็มหน้าจออัตโนมัติ */
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-    width: 100%;
-  }
-
-  .card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    width: 100%;
-    overflow: hidden;
-  }
-
-  /* การ์ดรายการอุปกรณ์/การยืม ปรับให้เรียงลงล่างบนมือถือ ป้องกันการดันล้นจอ */
-  .item-card {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    background: #fff;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    width: 100%;
-    word-break: break-word;
-  }
-
-  .item-info, .info {
-    flex: 1;
-    min-width: 0;
-    margin-bottom: 12px;
-  }
-
-  /* ปรับแต่งปุ่มกดคืน / ปุ่มจัดการให้อยู่เต็มความกว้างในมือถือ กดง่ายไม่ตกขอบ */
-  .item-action, .return-btn-container {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .return-btn, button {
-    width: 100%;
-    padding: 12px 16px;
-    background: #1565c0;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    text-align: center;
-  }
-
-  /* ปรับแต่งสถานะแบดจ์ */
-  .available { color: #047857; background: #d1fae5; padding: 4px 10px; border-radius: 20px; font-size: 12px; display: inline-block; }
-  .borrowed { color: #b45309; background: #fef3c7; padding: 4px 10px; border-radius: 20px; font-size: 12px; display: inline-block; }
-  .maintenance { color: #b91c1c; background: #fee2e2; padding: 4px 10px; border-radius: 20px; font-size: 12px; display: inline-block; }
-  .inactive { color: #475569; background: #e2e8f0; padding: 4px 10px; border-radius: 20px; font-size: 12px; display: inline-block; }
-
-  /* สำหรับหน้าจอแท็บเล็ตและคอมพิวเตอร์ (Desktop) ให้แสดงผลแบบหลายคอลัมน์และปุ่มอยู่ด้านข้างปกติ */
-  @media (min-width: 768px) {
-    .main {
-      padding: 24px;
+    
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --navy: #0f172a;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --green: #059669;
+      --red: #dc2626;
+      --orange: #d97706;
     }
-    .grid {
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: var(--bg);
+      font-family: "Prompt", sans-serif;
+    }
+
+    button, input, select, textarea { font-family: inherit; }
+    button { cursor: pointer; }
+
+    .layout { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      width: 265px;
+      padding: 24px 16px;
+      color: white;
+      background: var(--navy);
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 8px 10px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .brand-icon {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      font-size: 22px;
+      place-items: center;
+      border-radius: 13px;
+      background: linear-gradient(135deg, #3b82f6, #14b8a6);
+    }
+
+    .brand h1 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.35; }
+    .brand p { margin: 2px 0 0; color: #94a3b8; font-size: 10px; }
+
+    .staff-box {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 13px;
+      margin: 22px 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+    }
+
+    .avatar {
+      display: grid;
+      width: 35px;
+      height: 35px;
+      font-size: 17px;
+      flex-shrink: 0;
+      place-items: center;
+      border-radius: 50%;
+      background: #334155;
+    }
+
+    .staff-box div:last-child { min-width: 0; }
+    .staff-box strong, .staff-box span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .staff-box strong { font-size: 12px; }
+    .staff-box span { margin-top: 2px; color: #94a3b8; font-size: 10px; }
+
+    .nav-btn {
+      width: 100%;
+      padding: 12px 13px;
+      color: #cbd5e1;
+      font-size: 13px;
+      text-align: left;
+      background: transparent;
+      border: 0;
+      border-radius: 10px;
+      transition: 0.2s;
+    }
+
+    .nav-btn:hover { color: white; background: rgba(255, 255, 255, 0.08); }
+    .nav-btn.active { color: white; font-weight: 500; background: var(--blue); }
+
+    .sidebar-footer {
+      padding: 14px 9px 0;
+      margin-top: auto;
+      color: #64748b;
+      font-size: 10px;
+      line-height: 1.7;
+    }
+
+    .main { width: 100%; padding: 30px; margin-left: 265px; }
+    .section { display: none; max-width: 1250px; margin: 0 auto; }
+    .section.active { display: block; }
+
+    .page-header {
+      display: flex;
       gap: 16px;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 22px;
     }
-    .item-card {
-      flex-direction: row;
+    .page-header h2 { margin: 0; font-size: 24px; font-weight: 600; }
+    .page-header p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+
+    .action-row { display: flex; gap: 9px; flex-wrap: wrap; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
       align-items: center;
       justify-content: space-between;
+      padding: 15px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
     }
-    .item-info, .info {
-      margin-bottom: 0;
+
+    .search {
+      width: 100%;
+      max-width: 390px;
+      padding: 10px 13px;
+      font-size: 12px;
+      outline: none;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
     }
-    .item-action, .return-btn-container {
-      width: auto;
+    .search:focus { background: white; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+
+    .summary { color: var(--muted); font-size: 12px; }
+
+    .btn {
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 0;
+      border-radius: 10px;
+      transition: 0.2s;
     }
-    .return-btn, button {
-      width: auto;
+    .btn-primary { color: white; background: var(--blue); }
+    .btn-primary:hover { background: var(--blue-dark); }
+    .btn-success { color: white; background: var(--green); }
+    .btn-success:hover { background: #047857; }
+    .btn-outline { color: #334155; background: white; border: 1px solid var(--border); }
+    .btn-outline:hover { background: #f8fafc; }
+    .btn-danger { color: var(--red); background: #fee2e2; }
+    .btn-danger:hover { background: #fecaca; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+      gap: 16px;
     }
-  }
+
+    .item-card {
+      padding: 16px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .item-top { display: flex; gap: 12px; align-items: flex-start; }
+    .item-icon, .item-image { width: 54px; height: 54px; flex-shrink: 0; border-radius: 12px; }
+    .item-icon { display: grid; font-size: 25px; place-items: center; background: #eff6ff; }
+    .item-image { object-fit: cover; background: #eff6ff; }
+
+    .item-title { min-width: 0; flex: 1; }
+    .item-title h3 { margin: 0; overflow: hidden; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+    .item-id { margin-top: 3px; color: var(--muted); font-size: 11px; font-family: monospace; }
+
+    .badge {
+      display: inline-flex;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+      border-radius: 999px;
+    }
+    .available { color: #047857; background: #d1fae5; }
+    .borrowed { color: #b45309; background: #fef3c7; }
+    .maintenance { color: #b91c1c; background: #fee2e2; }
+    .inactive { color: #475569; background: #e2e8f0; }
+
+    .details { padding: 11px; margin: 15px 0; font-size: 12px; background: #f8fafc; border-radius: 12px; }
+    .row { display: flex; gap: 10px; justify-content: space-between; padding: 4px 0; }
+    .row span:first-child { flex-shrink: 0; color: var(--muted); }
+    .row span:last-child { text-align: right; word-break: break-word; }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+    .info { min-width: 0; padding: 9px; background: #f8fafc; border-radius: 10px; }
+    .info.full { grid-column: 1 / -1; }
+    .info label { display: block; margin-bottom: 3px; color: var(--muted); font-size: 10px; }
+    .info span { display: block; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+
+    .card-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+    .state { padding: 52px 20px; color: var(--muted); font-size: 13px; text-align: center; background: white; border: 1px solid var(--border); border-radius: 16px; }
+    .spinner {
+      width: 34px; height: 34px; margin: 0 auto 13px;
+      border: 4px solid #dbeafe; border-top-color: var(--blue);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .about { max-width: 760px; padding: 24px; }
+    .about h3 { margin-top: 0; }
+    .about ul { padding-left: 20px; color: #475569; font-size: 13px; line-height: 1.9; }
+
+    .mobile-bar { display: none; }
+
+    @media (max-width: 760px) {
+      .sidebar { display: none; }
+      .main { padding: 16px; padding-top: 78px; margin-left: 0; }
+      .mobile-bar {
+        position: fixed; inset: 0 0 auto; z-index: 20;
+        display: flex; height: 62px; padding: 0 15px; color: white;
+        align-items: center; justify-content: space-between; background: var(--navy);
+      }
+      .mobile-bar strong { font-size: 13px; }
+      .mobile-tab { padding: 7px 9px; color: #e2e8f0; font-size: 10px; background: #334155; border: 0; border-radius: 8px; }
+      .mobile-tab.active { color: white; background: var(--blue); }
+      .page-header { display: block; }
+      .page-header .action-row { margin-top: 14px; }
+      .grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 
@@ -123,7 +276,7 @@
   <iframe name="postFrame" id="postFrame" style="display:none;"></iframe>
 
   <div class="mobile-bar">
-    <strong>ระบบส่วนหลังบ้าน IT</strong>
+    <strong>ระบบหลังบ้าน IT</strong>
     <div>
       <button class="mobile-tab active" data-tab="returns">คืน</button>
       <button class="mobile-tab" data-tab="equipment">คลัง</button>
