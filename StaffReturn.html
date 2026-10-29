@@ -399,7 +399,7 @@
 
   <script>
     const CONFIG = {
-      LIFF_ID: '2012231859-0lxjel3D',
+      LIFF_ID: '2012231859-JPQsyM36',
       API_URL: 'https://script.google.com/macros/s/AKfycbxokOJDBVKK2VgM06iYhCnZ4mjPcXnN9FD-4uGx_e0qbAdsR4rPHlo-jPBZaz2tCroL/exec'
     };
 
@@ -411,7 +411,7 @@
     document.addEventListener('DOMContentLoaded', initSystem);
 
     async function initSystem() {
-      // ผูกเมนูก่อนทันที เพื่อให้กดเปลี่ยนหน้า Tab ดูเมนูอื่นๆ ได้แม้กำลังโหลด
+      // ผูกเมนูก่อนทันที เพื่อให้กดสลับ Tab ได้แม้กำลังโหลด
       bindEvents();
 
       try {
@@ -432,7 +432,6 @@
           throw new Error('ไม่พบ LINE ID Token กรุณาเปิดหน้านี้ผ่านลิงก์ LIFF');
         }
 
-        // ยิงเช็กสิทธิ์และดึงข้อมูลหลังบ้าน
         const response = await apiGet('staffBootstrap', { idToken: idToken });
 
         if (!response || !response.success) {
@@ -457,34 +456,34 @@
       } catch (error) {
         console.error(error);
 
-        document.getElementById('staffName').textContent = 'ไม่มีสิทธิ์เข้าถึง';
-        document.getElementById('staffRole').textContent = 'ถูกปฏิเสธการเข้าใช้งาน';
+        let lineUserId = '';
+        try {
+          const decoded = liff.getDecodedIDToken();
+          lineUserId = decoded && decoded.sub ? decoded.sub : '';
+        } catch (e) {}
 
+        document.getElementById('staffName').textContent = 'เข้าใช้งานไม่ได้';
+        document.getElementById('staffRole').textContent = 'ตรวจสอบสิทธิ์ไม่สำเร็จ';
         setLoanLoading(false);
         setEquipmentLoading(false);
 
-        // เด้ง Popup แจ้งเตือนสิทธิ์ทันที
-        await Swal.fire({
-          icon: 'error',
-          title: 'ไม่ได้รับอนุญาตให้เข้าใช้งาน',
-          text: error.message || 'หน้านี้สำหรับเจ้าหน้าที่ (STAFF หรือ ADMIN) เท่านั้น',
-          confirmButtonText: 'รับทราบ',
-          confirmButtonColor: '#dc2626',
-          allowOutsideClick: false
-        });
-
-        // ปิดหรือพับหน้าจอหนี หรือปล่อยให้ดูหน้าจอเปล่าพร้อมข้อความแจ้งเตือน
-        document.getElementById('loanList').innerHTML = `
-          <div class="state" style="grid-column:1/-1;">
-            <strong style="color:#dc2626;font-size:16px;">❌ ไม่มีสิทธิ์เข้าถึงระบบหลังบ้าน</strong>
-            <div style="margin-top:8px;color:#475569;">
-              ${escapeHtml(error.message)}
-            </div>
-            <div style="margin-top:12px;font-size:11px;color:#94a3b8;">
-              หากคุณเป็นเจ้าหน้าที่ กรุณาตรวจสอบสิทธิ์ Role ในชีต Users ว่าเป็น STAFF หรือ ADMIN แล้วหรือยัง
-            </div>
-          </div>
+        const detail = `
+          <div style="margin-top:8px;color:#dc2626;">${escapeHtml(error.message || 'เกิดข้อผิดพลาด')}</div>
+          ${lineUserId ? `<div style="margin-top:12px;font-size:11px;color:#64748b;">
+            LINE User ID ของคุณ:<br><code style="word-break:break-all;">${escapeHtml(lineUserId)}</code>
+          </div>` : ''}
         `;
+
+        document.getElementById('loanList').innerHTML =
+          `<div class="state" style="grid-column:1/-1;"><strong>ไม่สามารถเปิดระบบหลังบ้านได้</strong>${detail}</div>`;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'ไม่อนุญาตให้เข้าใช้งาน',
+          html: detail,
+          confirmButtonText: 'รับทราบ',
+          confirmButtonColor: '#dc2626'
+        });
       }
     }
 
@@ -577,7 +576,9 @@
       for (let i = 0; i < 25; i++) {
         await sleep(700);
         const response = await apiGet('requestStatus', { idToken: idToken, requestId: requestId });
-        if (!response || !response.success) throw new Error(response.message || 'ตรวจสอบสถานะไม่สำเร็จ');
+        if (!response || !response.success) {
+          throw new Error((response && response.message) || 'ตรวจสอบสถานะไม่สำเร็จ');
+        }
         const result = response.data;
         if (result.status === 'SUCCESS') return result.result || {};
         if (result.status === 'ERROR') throw new Error(result.message || 'บันทึกข้อมูลไม่สำเร็จ');
@@ -590,7 +591,9 @@
       setLoanLoading(true);
       try {
         const response = await apiGet('staffLoans', { idToken: idToken });
-        if (!response || !response.success) throw new Error(response.message || 'โหลดรายการไม่สำเร็จ');
+        if (!response || !response.success) {
+          throw new Error((response && response.message) || 'โหลดรายการไม่สำเร็จ');
+        }
         allLoans = response.data || [];
         renderLoans(allLoans);
       } catch (error) {
@@ -604,7 +607,9 @@
       setEquipmentLoading(true);
       try {
         const response = await apiGet('staffEquipment', { idToken: idToken });
-        if (!response || !response.success) throw new Error(response.message || 'โหลดข้อมูลไม่สำเร็จ');
+        if (!response || !response.success) {
+          throw new Error((response && response.message) || 'โหลดข้อมูลไม่สำเร็จ');
+        }
         allEquipment = response.data || [];
         renderEquipment(allEquipment);
       } catch (error) {
@@ -670,7 +675,9 @@
 
     function filterLoans() {
       const keyword = document.getElementById('loanSearch').value.trim().toLowerCase();
-      const filtered = allLoans.filter(l => [l.equipmentId, l.equipmentName, l.borrowerName, l.purpose].join(' ').toLowerCase().includes(keyword));
+      const filtered = allLoans.filter(l =>
+        [l.equipmentId, l.equipmentName, l.borrowerName, l.purpose].join(' ').toLowerCase().includes(keyword)
+      );
       renderLoans(filtered);
     }
 
@@ -685,7 +692,7 @@
         confirmButtonText: 'ยืนยันรับคืน',
         cancelButtonText: 'ยกเลิก',
         confirmButtonColor: '#059669',
-        inputValidator: val => !val || !val.trim() ? 'กรุณาระบุสภาพหรือหมายเหตุการคืน' : null
+        inputValidator: val => (!val || !val.trim()) ? 'กรุณาระบุสภาพหรือหมายเหตุการคืน' : null
       });
       if (!result.isConfirmed) return;
       await submitReturn(loan.loanId, loan.equipmentId, result.value.trim());
@@ -762,7 +769,9 @@
 
     function filterEquipment() {
       const keyword = document.getElementById('equipmentSearch').value.trim().toLowerCase();
-      const filtered = allEquipment.filter(e => [e.equipmentId, e.equipmentName, e.category, e.location].join(' ').toLowerCase().includes(keyword));
+      const filtered = allEquipment.filter(e =>
+        [e.equipmentId, e.equipmentName, e.category, e.location, e.status, e.note].join(' ').toLowerCase().includes(keyword)
+      );
       renderEquipment(filtered);
     }
 
@@ -796,16 +805,22 @@
               <textarea id="eqNote" class="swal2-textarea" style="width:100%;height:78px;margin:0;">${escapeHtml(item ? item.note : '')}</textarea></div>
           </div>
         `,
-        didOpen: () => { document.getElementById('eqStatus').value = item && item.status ? item.status : 'AVAILABLE'; },
+        didOpen: () => {
+          document.getElementById('eqStatus').value = item && item.status ? item.status : 'AVAILABLE';
+        },
         showCancelButton: true,
         confirmButtonText: isEdit ? 'บันทึก' : 'เพิ่ม',
         cancelButtonText: 'ยกเลิก',
         preConfirm: () => {
           const equipmentId = document.getElementById('eqId').value.trim();
           const equipmentName = document.getElementById('eqName').value.trim();
-          if (!equipmentId || !equipmentName) { Swal.showValidationMessage('กรุณากรอกรหัสและชื่ออุปกรณ์'); return false; }
+          if (!equipmentId || !equipmentName) {
+            Swal.showValidationMessage('กรุณากรอกรหัสและชื่ออุปกรณ์');
+            return false;
+          }
           return {
-            equipmentId, equipmentName,
+            equipmentId: equipmentId,
+            equipmentName: equipmentName,
             category: document.getElementById('eqCategory').value.trim(),
             location: document.getElementById('eqLocation').value.trim(),
             imageUrl: document.getElementById('eqImageUrl').value.trim(),
@@ -821,7 +836,18 @@
     async function saveEquipment(values) {
       Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
       try {
-        const result = await apiPost({ action: 'saveEquipment', requestId: createRequestId(), idToken: idToken, ...values });
+        const result = await apiPost({
+          action: 'saveEquipment',
+          requestId: createRequestId(),
+          idToken: idToken,
+          equipmentId: values.equipmentId,
+          equipmentName: values.equipmentName,
+          category: values.category,
+          location: values.location,
+          imageUrl: values.imageUrl,
+          status: values.status,
+          note: values.note
+        });
         await loadEquipment();
         Swal.fire({ icon: 'success', title: 'สำเร็จ', text: result.message || 'บันทึกเรียบร้อย' });
       } catch (err) {
@@ -830,15 +856,25 @@
     }
 
     async function deleteEquipment(equipmentId, equipmentName) {
-      const confirm = await Swal.fire({
-        icon: 'warning', title: 'ยืนยันการลบ',
+      const confirmation = await Swal.fire({
+        icon: 'warning',
+        title: 'ยืนยันการลบ',
         text: `ต้องการลบ ${equipmentName || equipmentId} ใช่หรือไม่?`,
-        showCancelButton: true, confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#dc2626'
+        showCancelButton: true,
+        confirmButtonText: 'ลบ',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#dc2626'
       });
-      if (!confirm.isConfirmed) return;
+      if (!confirmation.isConfirmed) return;
+
       Swal.fire({ title: 'กำลังลบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
       try {
-        const result = await apiPost({ action: 'deleteEquipment', requestId: createRequestId(), idToken: idToken, equipmentId: equipmentId });
+        const result = await apiPost({
+          action: 'deleteEquipment',
+          requestId: createRequestId(),
+          idToken: idToken,
+          equipmentId: equipmentId
+        });
         await loadEquipment();
         Swal.fire({ icon: 'success', title: 'สำเร็จ', text: result.message || 'ลบเรียบร้อย' });
       } catch (err) {
@@ -848,40 +884,69 @@
 
     function setLoanLoading(show) {
       document.getElementById('loanLoading').style.display = show ? 'block' : 'none';
-      if (show) { document.getElementById('loanEmpty').style.display = 'none'; document.getElementById('loanList').innerHTML = ''; }
+      if (show) {
+        document.getElementById('loanEmpty').style.display = 'none';
+        document.getElementById('loanList').innerHTML = '';
+      }
     }
 
     function setEquipmentLoading(show) {
       document.getElementById('equipmentLoading').style.display = show ? 'block' : 'none';
-      if (show) { document.getElementById('equipmentEmpty').style.display = 'none'; document.getElementById('equipmentList').innerHTML = ''; }
+      if (show) {
+        document.getElementById('equipmentEmpty').style.display = 'none';
+        document.getElementById('equipmentList').innerHTML = '';
+      }
     }
 
     function getStatusName(status) {
-      return { AVAILABLE: 'พร้อมให้ยืม', BORROWED: 'กำลังถูกยืม', MAINTENANCE: 'อยู่ระหว่างซ่อม', INACTIVE: 'ปิดใช้งาน' }[status] || status || '-';
+      const map = {
+        AVAILABLE: 'พร้อมให้ยืม',
+        BORROWED: 'กำลังถูกยืม',
+        MAINTENANCE: 'อยู่ระหว่างซ่อม',
+        INACTIVE: 'ปิดใช้งาน'
+      };
+      return map[status] || status || '-';
     }
 
     function getStatusClass(status) {
-      return { AVAILABLE: 'available', BORROWED: 'borrowed', MAINTENANCE: 'maintenance', INACTIVE: 'inactive' }[status] || 'inactive';
+      const map = {
+        AVAILABLE: 'available',
+        BORROWED: 'borrowed',
+        MAINTENANCE: 'maintenance',
+        INACTIVE: 'inactive'
+      };
+      return map[status] || 'inactive';
     }
 
     function createRequestId() {
       return 'REQ_' + Date.now() + '_' + Math.random().toString(36).substring(2, 12);
     }
 
-    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-    function formatDate(val) {
-      if (!val) return '-';
-      const d = new Date(val);
-      return isNaN(d.getTime()) ? String(val) : d.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    function formatDate(value) {
+      if (!value) return '-';
+      const d = new Date(value);
+      return isNaN(d.getTime())
+        ? String(value)
+        : d.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
-    function escapeAttribute(str) { return escapeHtml(str).replace(/`/g, '&#096;'); }
+    function escapeHtml(value) {
+      if (value === null || value === undefined) return '';
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value).replace(/`/g, '&#096;');
+    }
   </script>
 </body>
 </html>
