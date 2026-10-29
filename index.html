@@ -432,9 +432,36 @@
       }
       
       const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('tab') === 'status') {
+
+        let targetTab = urlParams.get('tab');
+
+
+        // ถ้าส่งผ่านระบบสเตทของ LIFF
+
+        const liffState = urlParams.get('liff.state');
+
+        if (!targetTab && liffState) {
+
+          try {
+
+            const stateParams = new URLSearchParams(liffState.startsWith('?') ? liffState.substring(1) : liffState);
+
+            targetTab = stateParams.get('tab');
+
+          } catch (e) {
+
+            console.error('Error parsing liff.state:', e);
+
+          }
+
+        }
+
+
+        if (targetTab === 'status') {
+
           switchTab('status');
-      }
+
+        }
 
     }
 
