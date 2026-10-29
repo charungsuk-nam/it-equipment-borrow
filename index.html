@@ -431,38 +431,24 @@
         document.getElementById('userDetail').textContent = 'กรุณาเปิดผ่าน LINE Official Account';
       }
       
+      // --- ตรวจสอบพารามิเตอร์ tab (รองรับทั้งแบบปกติและผ่าน liff.state) ---
       const urlParams = new URLSearchParams(window.location.search);
+      let targetTab = urlParams.get('tab');
 
-        let targetTab = urlParams.get('tab');
-
-
-        // ถ้าส่งผ่านระบบสเตทของ LIFF
-
-        const liffState = urlParams.get('liff.state');
-
-        if (!targetTab && liffState) {
-
-          try {
-
-            const stateParams = new URLSearchParams(liffState.startsWith('?') ? liffState.substring(1) : liffState);
-
-            targetTab = stateParams.get('tab');
-
-          } catch (e) {
-
-            console.error('Error parsing liff.state:', e);
-
-          }
-
+      // ถ้าส่งผ่านระบบสเตทของ LIFF
+      const liffState = urlParams.get('liff.state');
+      if (!targetTab && liffState) {
+        try {
+          const stateParams = new URLSearchParams(liffState.startsWith('?') ? liffState.substring(1) : liffState);
+          targetTab = stateParams.get('tab');
+        } catch (e) {
+          console.error('Error parsing liff.state:', e);
         }
+      }
 
-
-        if (targetTab === 'status') {
-
-          switchTab('status');
-
-        }
-
+      if (targetTab === 'status') {
+        switchTab('status');
+      }
     }
 
     // ฟังก์ชันสลับหน้าจอระหว่าง ยืมอุปกรณ์ กับ รายการของฉัน
@@ -478,7 +464,6 @@
       if (tabName === 'borrow') {
         if (searchBox) searchBox.style.display = 'block';
         if (equipmentList) equipmentList.style.display = 'grid';
-        // แสดงตะกร้าหรือฟอร์มตามสถานะการเลือกเดิม (ถ้ามี)
         statusSec.style.display = 'none';
         btnBorrow.style.background = '#1565c0';
         btnBorrow.style.color = '#fff';
