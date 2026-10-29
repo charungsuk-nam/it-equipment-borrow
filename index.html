@@ -375,7 +375,7 @@
   <iframe id="postFrame" name="postFrame" style="display:none;"></iframe>
 
   <script>
-    const CONFIG = {
+      const CONFIG = {
       LIFF_ID: '2012231859-0lxjeI3D',
       API_URL: 'https://script.google.com/macros/s/AKfycbxokOJDBVKK2VgM06iYhCnZ4mjPcXnN9FD-4uGx_e0qbAdsR4rPHlo-jPBZaz2tCroL/exec'
     };
@@ -435,7 +435,6 @@
       const urlParams = new URLSearchParams(window.location.search);
       let targetTab = urlParams.get('tab');
 
-      // ถ้าส่งผ่านระบบสเตทของ LIFF
       const liffState = urlParams.get('liff.state');
       if (!targetTab && liffState) {
         try {
@@ -451,8 +450,7 @@
       }
     }
 
-    // ฟังก์ชันสลับหน้าจอระหว่าง ยืมอุปกรณ์ กับ รายการของฉัน
-        // ฟังก์ชันสลับหน้าจอระหว่าง ยืมอุปกรณ์ กับ รายการของฉัน
+    // ฟังก์ชันสลับหน้าจอระหว่าง ยืมอุปกรณ์ กับ รายการของฉัน (พร้อมซ่อนส่วนค้นหาและฟอร์มยืมอย่างเด็ดขาด)
     function switchTab(tabName) {
       const searchBox = document.getElementById('searchBox') || document.querySelector('.search-container');
       const equipmentList = document.getElementById('equipmentList');
@@ -462,10 +460,15 @@
       const btnBorrow = document.getElementById('tabBorrow');
       const btnStatus = document.getElementById('tabStatus');
 
+      const formContainer = loanForm ? loanForm.closest('.card, .form-container, div') : null;
+
       if (tabName === 'borrow') {
         if (searchBox) searchBox.style.display = 'block';
         if (equipmentList) equipmentList.style.display = 'grid';
-        if (loanForm) loanForm.style.display = 'block'; // แสดงฟอร์มยืมปกติ
+        if (loanForm) loanForm.style.display = 'block';
+        if (formContainer && formContainer !== statusSec) formContainer.style.display = 'block';
+        if (cartBox && Object.keys(selectedEquipment).length > 0) cartBox.style.display = 'block';
+        
         statusSec.style.display = 'none';
         btnBorrow.style.background = '#1565c0';
         btnBorrow.style.color = '#fff';
@@ -477,6 +480,7 @@
         if (equipmentList) equipmentList.style.display = 'none';
         if (cartBox) cartBox.style.display = 'none';
         if (loanForm) loanForm.style.display = 'none';
+        if (formContainer && formContainer !== statusSec) formContainer.style.display = 'none';
         
         statusSec.style.display = 'block';
         btnStatus.style.background = '#1565c0';
@@ -484,12 +488,11 @@
         btnBorrow.style.background = '#e0e0e0';
         btnBorrow.style.color = '#333';
         
-        // เรียกโหลดข้อมูลรายการยืมของผู้ใช้ทันที
         loadMyLoans();
       }
     }
 
-    // ฟังก์ชันดึงข้อมูลรายการยืมของฉันจาก Backend
+    // ฟังก์ชันดึงข้อมูลรายการยืมของฉันจาก Backend (พร้อมจัดรูปแบบวันที่ให้แสดงผลเสถียรทั้งมือถือและคอม)
     async function loadMyLoans() {
       const container = document.getElementById('myLoansList');
       container.innerHTML = '<div style="text-align: center; color: #777; padding: 40px; background: #fff; border-radius: 12px;">กำลังโหลดข้อมูล...</div>';
@@ -509,14 +512,24 @@
           const badgeStyle = isBorrowed 
             ? 'background: #e3f2fd; color: #1565c0;' 
             : 'background: #e8f5e9; color: #2e7d32;';
+
+          const formatDateStr = (dateStr) => {
+            if (!dateStr) return '-';
+            const cleanDate = String(dateStr).split('T')[0];
+            const parts = cleanDate.split('-');
+            if (parts.length === 3) {
+              return `${parts[2]}/${parts[1]}/${Number(parts[0]) + 543}`;
+            }
+            return dateStr;
+          };
           
           const card = document.createElement('div');
           card.style.cssText = 'background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; gap: 10px;';
           card.innerHTML = `
             <div style="flex: 1;">
               <h4 style="margin: 0 0 6px 0; color: #333; font-size: 16px;">${escapeHtml(loan.equipmentName)} <span style="font-size: 13px; color: #666; font-weight: normal;">(${escapeHtml(loan.equipmentId)})</span></h4>
-              <div style="font-size: 13px; color: #555; margin-bottom: 3px;">📅 วันที่ยืม: ${escapeHtml(loan.borrowedAt)}</div>
-              <div style="font-size: 13px; color: #555; margin-bottom: 3px;">⏳ กำหนดคืน: ${escapeHtml(loan.dueDate)}</div>
+              <div style="font-size: 13px; color: #555; margin-bottom: 3px;">📅 วันที่ยืม: ${escapeHtml(formatDateStr(loan.borrowedAt))}</div>
+              <div style="font-size: 13px; color: #555; margin-bottom: 3px;">⏳ กำหนดคืน: ${escapeHtml(formatDateStr(loan.dueDate))}</div>
               <div style="font-size: 13px; color: #555;">📝 วัตถุประสงค์: ${escapeHtml(loan.purpose || '-')}</div>
             </div>
             <div>
