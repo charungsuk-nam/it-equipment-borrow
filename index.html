@@ -452,6 +452,7 @@
     }
 
     // ฟังก์ชันสลับหน้าจอระหว่าง ยืมอุปกรณ์ กับ รายการของฉัน
+        // ฟังก์ชันสลับหน้าจอระหว่าง ยืมอุปกรณ์ กับ รายการของฉัน
     function switchTab(tabName) {
       const searchBox = document.getElementById('searchBox') || document.querySelector('.search-container');
       const equipmentList = document.getElementById('equipmentList');
@@ -464,16 +465,19 @@
       if (tabName === 'borrow') {
         if (searchBox) searchBox.style.display = 'block';
         if (equipmentList) equipmentList.style.display = 'grid';
+        if (loanForm) loanForm.style.display = 'block'; // แสดงฟอร์มยืมปกติ
         statusSec.style.display = 'none';
         btnBorrow.style.background = '#1565c0';
         btnBorrow.style.color = '#fff';
         btnStatus.style.background = '#e0e0e0';
         btnStatus.style.color = '#333';
       } else {
+        // ซ่อนทุกอย่างที่เกี่ยวกับการค้นหาและฟอร์มยืมออกให้หมดเมื่ออยู่หน้า "รายการของฉัน"
         if (searchBox) searchBox.style.display = 'none';
         if (equipmentList) equipmentList.style.display = 'none';
         if (cartBox) cartBox.style.display = 'none';
         if (loanForm) loanForm.style.display = 'none';
+        
         statusSec.style.display = 'block';
         btnStatus.style.background = '#1565c0';
         btnStatus.style.color = '#fff';
