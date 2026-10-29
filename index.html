@@ -376,7 +376,7 @@
   <iframe id="postFrame" name="postFrame" style="display:none;"></iframe>
 
   <script>
-      const CONFIG = {
+        const CONFIG = {
       LIFF_ID: '2012231859-0lxjeI3D',
       API_URL: 'https://script.google.com/macros/s/AKfycbxokOJDBVKK2VgM06iYhCnZ4mjPcXnN9FD-4uGx_e0qbAdsR4rPHlo-jPBZaz2tCroL/exec'
     };
@@ -387,6 +387,7 @@
     let currentEquipment = [];
     let searchTimer = null;
     let systemReady = false;
+    let cachedMyLoans = [];
 
     window.addEventListener('load', initializeSystem);
 
@@ -451,7 +452,7 @@
       }
     }
 
-    // ฟังก์ชันสลับหน้าจอระหว่าง ยืมอุปกรณ์ กับ รายการของฉัน (พร้อมซ่อนส่วนค้นหาและฟอร์มยืมอย่างเด็ดขาด)
+    // ฟังก์ชันสลับหน้าจอหลักระหว่าง ยืมอุปกรณ์ กับ รายการของฉัน
     function switchTab(tabName) {
       const searchBox = document.getElementById('searchBox') || document.querySelector('.search-container');
       const equipmentList = document.getElementById('equipmentList');
@@ -476,7 +477,6 @@
         btnStatus.style.background = '#e0e0e0';
         btnStatus.style.color = '#333';
       } else {
-        // ซ่อนทุกอย่างที่เกี่ยวกับการค้นหาและฟอร์มยืมออกให้หมดเมื่ออยู่หน้า "รายการของฉัน"
         if (searchBox) searchBox.style.display = 'none';
         if (equipmentList) equipmentList.style.display = 'none';
         if (cartBox) cartBox.style.display = 'none';
@@ -493,105 +493,176 @@
       }
     }
 
-        // ฟังก์ชันดึงข้อมูลรายการยืมของฉันจาก Backend (จัดเรียงบรรทัดวัน-เวลา และดึงวัตถุประสงค์)
+    // ฟังก์ชันสลับแท็บย่อย (กำลังยืมอยู่ / ประวัติการคืน)
+    function switchSubTab(subTab) {
+      const btnActive = document.getElementById('btnSubActive');
+      const btnHistory = document.getElementById('btnSubHistory');
+      const activeList = document.getElementById('activeLoansList');
+      const historyList = document.getElementById('historyLoansList');
+
+      if (!btnActive || !btnHistory || !activeList || !historyList) return;
+
+      if (subTab === 'active') {
+        activeList.style.display = 'block';
+        historyList.style.display = 'none';
+        btnActive.style.background = '#1565c0';
+        btnActive.style.color = '#fff';
+        btnHistory.style.background = 'transparent';
+        btnHistory.style.color = '#555';
+      } else {
+        activeList.style.display = 'none';
+        historyList.style.display = 'block';
+        btnHistory.style.background = '#1565c0';
+        btnHistory.style.color = '#fff';
+        btnActive.style.background = 'transparent';
+        btnActive.style.color = '#555';
+      }
+    }
+
+    // ฟังก์ชันดึงข้อมูลรายการยืมทั้งหมดมาเก็บไว้แคช
     async function loadMyLoans() {
-      const container = document.getElementById('myLoansList');
-      container.innerHTML = '<div style="text-align: center; color: #777; padding: 40px; background: #fff; border-radius: 12px;">กำลังโหลดข้อมูล...</div>';
+      const activeContainer = document.getElementById('activeLoansList');
+      const historyContainer = document.getElementById('historyLoansList');
+      
+      const loadingHtml = '<div style="text-align: center; color: #777; padding: 40px; background: #fff; border-radius: 12px;">กำลังโหลดข้อมูล...</div>';
+      if (activeContainer) activeContainer.innerHTML = loadingHtml;
+      if (historyContainer) historyContainer.innerHTML = loadingHtml;
 
       try {
         const idToken = liff.getIDToken();
-        const result = await apiGet('myLoans', { idToken: idToken });
+        cachedMyLoans = await apiGet('myLoans', { idToken: idToken });
         
-        if (!result || result.length === 0) {
-          container.innerHTML = '<div style="text-align: center; color: #777; padding: 40px; background: #fff; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">คุณยังไม่มีรายการยืมอุปกรณ์ในขณะนี้</div>';
-          return;
-        }
-
-        container.innerHTML = '';
-        result.forEach(loan => {
-          const isBorrowed = String(loan.status).toUpperCase() === 'BORROWED' || loan.status === 'กำลังยืม';
-          const badgeText = isBorrowed ? 'กำลังยืม' : loan.status;
-          const badgeStyle = isBorrowed 
-            ? 'background: #e3f2fd; color: #1565c0;' 
-            : 'background: #e8f5e9; color: #2e7d32;';
-
-          // ฟังก์ชันแปลงวันที่และเวลาให้อยู่ในบรรทัดเดียวกัน
-          const formatDateTimeStr = (dateStr) => {
-            if (!dateStr) return '-';
-            try {
-              const dateObj = new Date(dateStr);
-              if (isNaN(dateObj.getTime())) {
-                const cleanDate = String(dateStr).split('T')[0];
-                const parts = cleanDate.split('-');
-                if (parts.length === 3) {
-                  return `${parts[2]}/${parts[1]}/${Number(parts[0]) + 543}`;
-                }
-                return dateStr;
-              }
-              const day = String(dateObj.getDate()).padStart(2, '0');
-              const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-              const year = dateObj.getFullYear() + 543;
-              const hours = String(dateObj.getHours()).padStart(2, '0');
-              const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-              
-              // ตัดคำว่า "น." ออกจากด้านใน เพื่อต่อท้ายทีเดียวแบบไม่ขึ้นบรรทัดใหม่
-              return `${day}/${month}/${year} เวลา ${hours}:${minutes} น.`;
-            } catch (e) {
-              return dateStr;
-            }
-          };
-
-          // ฟังก์ชันคำนวณจำนวนวันที่เหลือ / เลยกำหนด
-          const getRemainingDaysText = (dueDateStr) => {
-            if (!dueDateStr) return '';
-            try {
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-
-              const dueObj = new Date(dueDateStr);
-              if (isNaN(dueObj.getTime())) return '';
-              dueObj.setHours(0, 0, 0, 0);
-
-              const diffTime = dueObj - today;
-              const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-              if (diffDays > 0) {
-                return `<span style="color: #2e7d32; font-weight: bold;">⏳ เหลือเวลาคืนอีก ${diffDays} วัน</span>`;
-              } else if (diffDays === 0) {
-                return `<span style="color: #f57c00; font-weight: bold;">⚠️ ครบกำหนดคืนวันนี้</span>`;
-              } else {
-                return `<span style="color: #d32f2f; font-weight: bold;">🚨 เลยกำหนดมา ${Math.abs(diffDays)} วัน</span>`;
-              }
-            } catch (e) {
-              return '';
-            }
-          };
-
-          const remainingText = isBorrowed ? getRemainingDaysText(loan.dueDate) : '';
-          
-          // ดึงค่าวัตถุประสงค์ (รองรับทั้ง property loan.purpose และเผื่อกรณีสะกด)
-          const purposeText = loan.purpose || loan.Reason || '-';
-
-          const card = document.createElement('div');
-          card.style.cssText = 'background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;';
-          card.innerHTML = `
-            <div style="flex: 1;">
-              <h4 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">${escapeHtml(loan.equipmentName)} <span style="font-size: 13px; color: #666; font-weight: normal;">(${escapeHtml(loan.equipmentId)})</span></h4>
-              <div style="font-size: 13px; color: #555; margin-bottom: 4px;">📅 วันที่ยืม: ${escapeHtml(formatDateTimeStr(loan.borrowedAt))}</div>
-              <div style="font-size: 13px; color: #555; margin-bottom: 4px;">⏳ กำหนดคืน: ${escapeHtml(formatDateTimeStr(loan.dueDate))}</div>
-              ${remainingText ? `<div style="font-size: 13px; margin-bottom: 4px;">${remainingText}</div>` : ''}
-              <div style="font-size: 13px; color: #555;">📝 วัตถุประสงค์: ${escapeHtml(purposeText)}</div>
-            </div>
-            <div>
-              <span style="padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; white-space: nowrap; ${badgeStyle}">${escapeHtml(badgeText)}</span>
-            </div>
-          `;
-          container.appendChild(card);
-        });
+        renderMyLoansLists();
 
       } catch (error) {
-        container.innerHTML = `<div style="text-align: center; color: #d32f2f; padding: 40px; background: #fff; border-radius: 12px;">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${escapeHtml(error.message)}</div>`;
+        const errHtml = `<div style="text-align: center; color: #d32f2f; padding: 40px; background: #fff; border-radius: 12px;">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${escapeHtml(error.message)}</div>`;
+        if (activeContainer) activeContainer.innerHTML = errHtml;
+        if (historyContainer) historyContainer.innerHTML = errHtml;
       }
+    }
+
+    // ฟังก์ชันคัดแยกและเรนเดอร์ข้อมูลลงแต่ละแท็บย่อย
+    function renderMyLoansLists() {
+      const activeContainer = document.getElementById('activeLoansList');
+      const historyContainer = document.getElementById('historyLoansList');
+
+      if (!activeContainer || !historyContainer) return;
+
+      if (!cachedMyLoans || cachedMyLoans.length === 0) {
+        const emptyHtml = '<div style="text-align: center; color: #777; padding: 40px; background: #fff; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">คุณยังไม่มีรายการยืมอุปกรณ์ในขณะนี้</div>';
+        activeContainer.innerHTML = emptyHtml;
+        historyContainer.innerHTML = emptyHtml;
+        return;
+      }
+
+      const activeLoans = [];
+      const historyLoans = [];
+
+      cachedMyLoans.forEach(loan => {
+        const statusUpper = String(loan.status || '').toUpperCase();
+        if (statusUpper === 'BORROWED' || statusUpper === 'กำลังยืม') {
+          activeLoans.push(loan);
+        } else {
+          historyLoans.push(loan);
+        }
+      });
+
+      // Render แท็บกำลังยืม
+      if (activeLoans.length === 0) {
+        activeContainer.innerHTML = '<div style="text-align: center; color: #777; padding: 40px; background: #fff; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">ไม่มีรายการที่กำลังยืมอยู่</div>';
+      } else {
+        activeContainer.innerHTML = '';
+        activeLoans.forEach(loan => {
+          activeContainer.appendChild(createLoanCard(loan, true));
+        });
+      }
+
+      // Render แท็บประวัติการคืน
+      if (historyLoans.length === 0) {
+        historyContainer.innerHTML = '<div style="text-align: center; color: #777; padding: 40px; background: #fff; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">ยังไม่มีประวัติการคืนอุปกรณ์</div>';
+      } else {
+        historyContainer.innerHTML = '';
+        historyLoans.forEach(loan => {
+          historyContainer.appendChild(createLoanCard(loan, false));
+        });
+      }
+    }
+
+    // ฟังก์ชันสร้างการ์ดแสดงผลข้อมูลแต่ละรายการ (จัดรูปแบบวัน-เวลาให้อยู่บรรทัดเดียวกัน)
+    function createLoanCard(loan, isActive) {
+      const badgeText = isActive ? 'กำลังยืม' : (loan.status || 'คืนแล้ว');
+      const badgeStyle = isActive 
+        ? 'background: #e3f2fd; color: #1565c0;' 
+        : 'background: #e8f5e9; color: #2e7d32;';
+
+      const formatDateTimeStr = (dateStr) => {
+        if (!dateStr) return '-';
+        try {
+          const dateObj = new Date(dateStr);
+          if (isNaN(dateObj.getTime())) {
+            const cleanDate = String(dateStr).split('T')[0];
+            const parts = cleanDate.split('-');
+            if (parts.length === 3) {
+              return `${parts[2]}/${parts[1]}/${Number(parts[0]) + 543}`;
+            }
+            return dateStr;
+          }
+          const day = String(dateObj.getDate()).padStart(2, '0');
+          const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+          const year = dateObj.getFullYear() + 543;
+          const hours = String(dateObj.getHours()).padStart(2, '0');
+          const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+          return `${day}/${month}/${year} เวลา ${hours}:${minutes} น.`;
+        } catch (e) {
+          return dateStr;
+        }
+      };
+
+      const getRemainingDaysText = (dueDateStr) => {
+        if (!dueDateStr) return '';
+        try {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          const dueObj = new Date(dueDateStr);
+          if (isNaN(dueObj.getTime())) return '';
+          dueObj.setHours(0, 0, 0, 0);
+
+          const diffTime = dueObj - today;
+          const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+          if (diffDays > 0) {
+            return `<span style="color: #2e7d32; font-weight: bold;">⏳ เหลือเวลาคืนอีก ${diffDays} วัน</span>`;
+          } else if (diffDays === 0) {
+            return `<span style="color: #f57c00; font-weight: bold;">⚠️ ครบกำหนดคืนวันนี้</span>`;
+          } else {
+            return `<span style="color: #d32f2f; font-weight: bold;">🚨 เลยกำหนดมา ${Math.abs(diffDays)} วัน</span>`;
+          }
+        } catch (e) {
+          return '';
+        }
+      };
+
+      const remainingText = isActive ? getRemainingDaysText(loan.dueDate) : '';
+      const purposeText = loan.purpose || loan.Reason || '-';
+      const returnedAtText = loan.returnedAt ? `<div style="font-size: 13px; color: #2e7d32; margin-top: 4px;">✅ คืนเมื่อ: ${formatDateTimeStr(loan.returnedAt)}</div>` : '';
+
+      const card = document.createElement('div');
+      card.style.cssText = 'background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;';
+      card.innerHTML = `
+        <div style="flex: 1;">
+          <h4 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">${escapeHtml(loan.equipmentName)} <span style="font-size: 13px; color: #666; font-weight: normal;">(${escapeHtml(loan.equipmentId)})</span></h4>
+          <div style="font-size: 13px; color: #555; margin-bottom: 4px;">📅 วันที่ยืม: ${escapeHtml(formatDateTimeStr(loan.borrowedAt))}</div>
+          <div style="font-size: 13px; color: #555; margin-bottom: 4px;">⏳ กำหนดคืน: ${escapeHtml(formatDateTimeStr(loan.dueDate))}</div>
+          ${remainingText ? `<div style="font-size: 13px; margin-bottom: 4px;">${remainingText}</div>` : ''}
+          ${returnedAtText}
+          <div style="font-size: 13px; color: #555; margin-top: 4px;">📝 วัตถุประสงค์: ${escapeHtml(purposeText)}</div>
+        </div>
+        <div>
+          <span style="padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; white-space: nowrap; ${badgeStyle}">${escapeHtml(badgeText)}</span>
+        </div>
+      `;
+      return card;
     }
 
     function validateConfig() {
@@ -616,27 +687,36 @@
 
       userName.textContent = user.fullName;
       userDetail.textContent = `สิทธิ์: ${user.role}${user.department ? ' · ' + user.department : ''}`;
-      document.getElementById('borrowerName').value = user.fullName;
+      
+      const borrowerNameField = document.getElementById('borrowerName');
+      if (borrowerNameField) borrowerNameField.value = user.fullName;
     }
 
     function enableForm() {
       systemReady = true;
 
-      document.getElementById('searchInput').disabled = false;
-      document.getElementById('dueDate').disabled = false;
-      document.getElementById('purpose').disabled = false;
+      const searchInput = document.getElementById('searchInput');
+      const dueDateInput = document.getElementById('dueDate');
+      const purposeInput = document.getElementById('purpose');
+      const submitBtn = document.getElementById('submitButton');
+      const loanForm = document.getElementById('loanForm');
 
-      const button = document.getElementById('submitButton');
-      button.disabled = false;
-      button.textContent = 'ยืนยันการยืมอุปกรณ์';
+      if (searchInput) searchInput.disabled = false;
+      if (dueDateInput) dueDateInput.disabled = false;
+      if (purposeInput) purposeInput.disabled = false;
 
-      document
-        .getElementById('searchInput')
-        .addEventListener('input', searchEquipment);
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'ยืนยันการยืมอุปกรณ์';
+      }
 
-      document
-        .getElementById('loanForm')
-        .addEventListener('submit', submitLoan);
+      if (searchInput) {
+        searchInput.addEventListener('input', searchEquipment);
+      }
+
+      if (loanForm) {
+        loanForm.addEventListener('submit', submitLoan);
+      }
     }
 
     function apiGet(action, parameters = {}) {
@@ -688,8 +768,11 @@
       clearTimeout(searchTimer);
 
       searchTimer = setTimeout(async () => {
-        const keyword = document.getElementById('searchInput').value.trim();
+        const searchInput = document.getElementById('searchInput');
         const list = document.getElementById('equipmentList');
+        if (!searchInput || !list) return;
+
+        const keyword = searchInput.value.trim();
 
         list.className = 'loading';
         list.textContent = 'กำลังค้นหาอุปกรณ์...';
@@ -710,6 +793,7 @@
 
     function renderEquipment(items) {
       const list = document.getElementById('equipmentList');
+      if (!list) return;
       list.innerHTML = '';
 
       if (!items.length) {
@@ -769,6 +853,8 @@
       const cartTitle = document.getElementById('cartTitle');
       const cartItems = document.getElementById('cartItems');
 
+      if (!cartBox || !cartTitle || !cartItems) return;
+
       if (!ids.length) {
         cartBox.style.display = 'none';
         return;
@@ -789,8 +875,11 @@
       event.preventDefault();
 
       const equipmentIds = Object.keys(selectedEquipment);
-      const dueDate = document.getElementById('dueDate').value;
-      const purpose = document.getElementById('purpose').value.trim();
+      const dueDateInput = document.getElementById('dueDate');
+      const purposeInput = document.getElementById('purpose');
+      
+      const dueDate = dueDateInput ? dueDateInput.value : '';
+      const purpose = purposeInput ? purposeInput.value.trim() : '';
 
       if (!equipmentIds.length) {
         showError('กรุณาเลือกอุปกรณ์อย่างน้อย 1 ชิ้น');
@@ -832,8 +921,10 @@
       if (!confirm.isConfirmed) return;
 
       const button = document.getElementById('submitButton');
-      button.disabled = true;
-      button.textContent = 'กำลังบันทึกรายการ...';
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'กำลังบันทึกรายการ...';
+      }
 
       try {
         const requestId = createRequestId();
@@ -867,8 +958,11 @@
           confirmButtonColor: '#1565c0'
         });
 
-        document.getElementById('loanForm').reset();
-        document.getElementById('borrowerName').value = currentUser.fullName;
+        const loanForm = document.getElementById('loanForm');
+        if (loanForm) loanForm.reset();
+        
+        const borrowerNameField = document.getElementById('borrowerName');
+        if (borrowerNameField) borrowerNameField.value = currentUser.fullName;
 
         selectedEquipment = {};
         updateCart();
@@ -879,8 +973,10 @@
         searchEquipment();
 
       } finally {
-        button.disabled = false;
-        button.textContent = 'ยืนยันการยืมอุปกรณ์';
+        if (button) {
+          button.disabled = false;
+          button.textContent = 'ยืนยันการยืมอุปกรณ์';
+        }
       }
     }
 
