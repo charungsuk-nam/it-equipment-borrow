@@ -327,6 +327,7 @@
     <strong>ระบบหลังบ้าน IT</strong>
     <div>
       <button class="mobile-tab active" data-tab="returns">คืน</button>
+      <button class="mobile-tab" data-tab="history">ประวัติ</button>
       <button class="mobile-tab" data-tab="equipment">คลัง</button>
       <button class="mobile-tab" data-tab="about">ข้อมูล</button>
     </div>
@@ -352,6 +353,7 @@
 
       <nav>
         <button class="nav-btn active" data-tab="returns">📥 ตรวจรับคืนอุปกรณ์</button>
+        <button class="nav-btn" data-tab="history">📜 ประวัติการยืม-คืน</button>
         <button class="nav-btn" data-tab="equipment">📦 จัดการคลังอุปกรณ์</button>
         <button class="nav-btn" data-tab="about">ℹ️ เกี่ยวกับระบบ</button>
       </nav>
@@ -391,6 +393,36 @@
         </div>
 
         <div id="loanList" class="grid"></div>
+      </section>
+
+      <section id="historySection" class="section">
+        <div class="page-header">
+          <div>
+            <h2>ประวัติการยืม-คืน</h2>
+            <p>รายการที่คืนเรียบร้อยแล้วทั้งหมด พร้อมชื่อผู้รับคืน</p>
+          </div>
+          <div class="action-row">
+            <button id="refreshHistoryBtn" class="btn btn-outline">🔄 รีเฟรช</button>
+          </div>
+        </div>
+
+        <div class="card toolbar">
+          <input id="historySearch" class="search" type="text" placeholder="ค้นหาอุปกรณ์, รหัส, ผู้ยืม หรือผู้รับคืน">
+          <span id="historyCount" class="summary">-</span>
+        </div>
+
+        <div id="historyLoading" class="state" style="display:none;">
+          <div class="spinner"></div>
+          กำลังโหลดประวัติการยืม-คืน...
+        </div>
+
+        <div id="historyEmpty" class="state" style="display:none;">
+          <div style="font-size:35px;margin-bottom:10px;">📜</div>
+          <strong>ยังไม่มีประวัติการคืน</strong>
+          <div style="margin-top:5px;">เมื่อมีการรับคืนอุปกรณ์ รายการจะแสดงที่นี่</div>
+        </div>
+
+        <div id="historyList" class="grid"></div>
       </section>
 
       <section id="equipmentSection" class="section">
@@ -437,6 +469,7 @@
           <ul>
             <li>ตรวจรับคืนอุปกรณ์และบันทึกสภาพอุปกรณ์ขณะคืนได้</li>
             <li>เมื่อรับคืนสำเร็จ สถานะอุปกรณ์จะเปลี่ยนเป็น AVAILABLE อัตโนมัติ</li>
+            <li>เมนูประวัติการยืม-คืนแสดงรายการที่คืนแล้วทั้งหมดและผู้รับคืน</li>
             <li>เมนูจัดการคลังใช้เพิ่ม แก้ไข หรือลบข้อมูลอุปกรณ์</li>
             <li>ระบบตรวจสอบตัวตนผ่าน LINE LIFF และ LINE ID Token</li>
             <li>ผู้ใช้ต้องมี Role เป็น STAFF หรือ ADMIN และ IsActive เป็น TRUE</li>
@@ -456,6 +489,7 @@
     let currentStaff = null;
     let allLoans = [];
     let allEquipment = [];
+    let allHistory = [];
 
     document.addEventListener('DOMContentLoaded', initSystem);
 
@@ -587,10 +621,12 @@
       });
 
       document.getElementById('refreshLoansBtn').addEventListener('click', loadLoans);
+      document.getElementById('refreshHistoryBtn').addEventListener('click', loadHistory);
       document.getElementById('refreshEquipmentBtn').addEventListener('click', loadEquipment);
       document.getElementById('addEquipmentBtn').addEventListener('click', () => openEquipmentModal());
 
       document.getElementById('loanSearch').addEventListener('input', filterLoans);
+      document.getElementById('historySearch').addEventListener('input', filterHistory);
       document.getElementById('equipmentSearch').addEventListener('input', filterEquipment);
     }
 
@@ -609,6 +645,9 @@
       document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(button => {
         button.classList.add('active');
       });
+
+      // เปิดแท็บประวัติแล้วโหลดข้อมูลล่าสุดทุกครั้ง
+      if (tabName === 'history') loadHistory();
     }
 
     function apiGet(action, parameters = {}) {
@@ -712,6 +751,22 @@
       }
     }
 
+    async function loadHistory() {
+      if (!idToken) return;
+      setHistoryLoading(true);
+      try {
+        const response = await apiGet('staffHistory', { idToken: idToken });
+        if (!response || !response.success) {
+          throw new Error((response && response.message) || 'โหลดประวัติไม่สำเร็จ');
+        }
+        allHistory = response.data || [];
+        filterHistory();
+      } catch (error) {
+        setHistoryLoading(false);
+        Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: error.message });
+      }
+    }
+
     function renderLoans(loans) {
       const list = document.getElementById('loanList');
       const empty = document.getElementById('loanEmpty');
@@ -775,6 +830,51 @@
       renderLoans(filtered);
     }
 
+    function renderHistory(items) {
+      const list = document.getElementById('historyList');
+      const empty = document.getElementById('historyEmpty');
+      setHistoryLoading(false);
+      list.innerHTML = '';
+      document.getElementById('historyCount').textContent = `พบ ${items.length} รายการที่คืนแล้ว`;
+
+      if (!items.length) { empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+
+      items.forEach(h => {
+        const card = document.createElement('article');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div class="item-top">
+            <div class="item-icon">📜</div>
+            <div class="item-title">
+              <h3>${escapeHtml(h.equipmentName || '-')}</h3>
+              <div class="item-id">${escapeHtml(h.equipmentId || '-')}</div>
+            </div>
+            <span class="badge available">คืนแล้ว</span>
+          </div>
+          <div class="details">
+            <div class="row"><span>ผู้ยืม</span><span>${escapeHtml(h.borrowerName || '-')}</span></div>
+            <div class="row"><span>วันที่ยืม</span><span>${escapeHtml(formatDate(h.borrowedAt))}</span></div>
+            <div class="row"><span>กำหนดคืน</span><span>${escapeHtml(formatDate(h.dueDate))}</span></div>
+            <div class="row"><span>วันที่คืน</span><span>${escapeHtml(formatDate(h.returnedAt))}</span></div>
+            <div class="row"><span>ผู้รับคืน</span><span style="font-weight:600;color:#059669;">${escapeHtml(h.receivedBy || '-')}</span></div>
+            <div class="row"><span>วัตถุประสงค์</span><span>${escapeHtml(h.purpose || '-')}</span></div>
+            <div class="row"><span>หมายเหตุ</span><span>${escapeHtml(h.returnNote || '-')}</span></div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function filterHistory() {
+      const keyword = document.getElementById('historySearch').value.trim().toLowerCase();
+      const filtered = allHistory.filter(h =>
+        [h.equipmentId, h.equipmentName, h.borrowerName, h.receivedBy, h.loanId]
+          .join(' ').toLowerCase().includes(keyword)
+      );
+      renderHistory(filtered);
+    }
+
     async function openReturnModal(loan) {
       const result = await Swal.fire({
         title: 'ยืนยันรับคืนอุปกรณ์',
@@ -803,7 +903,7 @@
           equipmentId: equipmentId,
           returnNote: returnNote
         });
-        await Promise.all([loadLoans(), loadEquipment()]);
+        await Promise.all([loadLoans(), loadEquipment(), loadHistory()]);
         Swal.fire({ icon: 'success', title: 'สำเร็จ', text: result.message || 'บันทึกข้อมูลเรียบร้อย' });
       } catch (err) {
         Swal.fire({ icon: 'error', title: 'ไม่สำเร็จ', text: err.message });
@@ -989,6 +1089,14 @@
       if (show) {
         document.getElementById('equipmentEmpty').style.display = 'none';
         document.getElementById('equipmentList').innerHTML = '';
+      }
+    }
+
+    function setHistoryLoading(show) {
+      document.getElementById('historyLoading').style.display = show ? 'block' : 'none';
+      if (show) {
+        document.getElementById('historyEmpty').style.display = 'none';
+        document.getElementById('historyList').innerHTML = '';
       }
     }
 

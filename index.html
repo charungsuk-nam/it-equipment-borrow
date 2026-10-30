@@ -492,7 +492,8 @@
       }
     }
 
-    // ฟังก์ชันดึงข้อมูลรายการยืมของฉันจาก Backend (ปรับดีไซน์ใหม่ + คำนวณวันครบกำหนดคืน)
+    // ฟังก์ชันดึงข้อมูลรายการยืมของฉันจาก Backend
+    // แยกเป็น 2 ส่วน: "กำลังยืมอยู่" และ "ประวัติการยืมทั้งหมด" (รายการที่คืนแล้ว)
     async function loadMyLoans() {
       const container = document.getElementById('myLoansList');
       container.innerHTML = '<div style="text-align: center; color: #777; padding: 40px; background: #fff; border-radius: 12px;">กำลังโหลดข้อมูล...</div>';
@@ -506,67 +507,78 @@
           return;
         }
 
-        container.innerHTML = '';
-        result.forEach(loan => {
-          const isBorrowed = String(loan.status).toUpperCase() === 'BORROWED' || loan.status === 'กำลังยืม';
-          const badgeText = isBorrowed ? 'กำลังยืม' : loan.status;
+        // ฟังก์ชันแปลงวันที่และเวลา
+        const formatDateTimeStr = (dateStr) => {
+          if (!dateStr) return '-';
+          try {
+            const dateObj = new Date(dateStr);
+            if (isNaN(dateObj.getTime())) {
+              const cleanDate = String(dateStr).split('T')[0];
+              const parts = cleanDate.split('-');
+              if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${Number(parts[0]) + 543}`;
+              }
+              return dateStr;
+            }
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = dateObj.getFullYear() + 543;
+            const hours = String(dateObj.getHours()).padStart(2, '0');
+            const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes} น.`;
+          } catch (e) {
+            return dateStr;
+          }
+        };
+
+        // ฟังก์ชันคำนวณจำนวนวันที่เหลือ / เลยกำหนด
+        const getRemainingDaysText = (dueDateStr) => {
+          if (!dueDateStr) return '';
+          try {
+            // เซ็ตค่าเวลาเป็น 00:00:00 เหมือนกัน เพื่อเทียบแค่วันที่
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const dueObj = new Date(dueDateStr);
+            if (isNaN(dueObj.getTime())) return '';
+            dueObj.setHours(0, 0, 0, 0);
+
+            const diffTime = dueObj - today;
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays > 0) {
+              return `<span style="color: #2e7d32; font-weight: bold;">⏳ เหลือเวลาคืนอีก ${diffDays} วัน</span>`;
+            } else if (diffDays === 0) {
+              return `<span style="color: #f57c00; font-weight: bold;">⚠️ ครบกำหนดคืนวันนี้</span>`;
+            } else {
+              return `<span style="color: #d32f2f; font-weight: bold;">🚨 เลยกำหนดมา ${Math.abs(diffDays)} วัน</span>`;
+            }
+          } catch (e) {
+            return '';
+          }
+        };
+
+        const isBorrowedLoan = (loan) =>
+          String(loan.status).toUpperCase() === 'BORROWED' || loan.status === 'กำลังยืม';
+
+        // สร้างการ์ดของแต่ละรายการ
+        const createLoanCard = (loan, isBorrowed) => {
+          const badgeText = isBorrowed ? 'กำลังยืม' : 'คืนแล้ว';
           const badgeStyle = isBorrowed 
             ? 'background: #e3f2fd; color: #1565c0;' 
             : 'background: #e8f5e9; color: #2e7d32;';
 
-          // ฟังก์ชันแปลงวันที่และเวลา
-          const formatDateTimeStr = (dateStr) => {
-            if (!dateStr) return '-';
-            try {
-              const dateObj = new Date(dateStr);
-              if (isNaN(dateObj.getTime())) {
-                const cleanDate = String(dateStr).split('T')[0];
-                const parts = cleanDate.split('-');
-                if (parts.length === 3) {
-                  return `${parts[2]}/${parts[1]}/${Number(parts[0]) + 543}`;
-                }
-                return dateStr;
-              }
-              const day = String(dateObj.getDate()).padStart(2, '0');
-              const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-              const year = dateObj.getFullYear() + 543;
-              const hours = String(dateObj.getHours()).padStart(2, '0');
-              const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-              return `${day}/${month}/${year} ${hours}:${minutes} น.`;
-            } catch (e) {
-              return dateStr;
-            }
-          };
-
-          // ฟังก์ชันคำนวณจำนวนวันที่เหลือ / เลยกำหนด
-          const getRemainingDaysText = (dueDateStr) => {
-            if (!dueDateStr) return '';
-            try {
-              // เซ็ตค่าเวลาเป็น 00:00:00 เหมือนกัน เพื่อเทียบแค่วันที่
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-
-              const dueObj = new Date(dueDateStr);
-              if (isNaN(dueObj.getTime())) return '';
-              dueObj.setHours(0, 0, 0, 0);
-
-              const diffTime = dueObj - today;
-              const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-              if (diffDays > 0) {
-                return `<span style="color: #2e7d32; font-weight: bold;">⏳ เหลือเวลาคืนอีก ${diffDays} วัน</span>`;
-              } else if (diffDays === 0) {
-                return `<span style="color: #f57c00; font-weight: bold;">⚠️ ครบกำหนดคืนวันนี้</span>`;
-              } else {
-                return `<span style="color: #d32f2f; font-weight: bold;">🚨 เลยกำหนดมา ${Math.abs(diffDays)} วัน</span>`;
-              }
-            } catch (e) {
-              return '';
-            }
-          };
-
           const remainingText = isBorrowed ? getRemainingDaysText(loan.dueDate) : '';
-          
+
+          // ส่วนข้อมูลการคืน (แสดงเฉพาะรายการที่คืนแล้ว)
+          const returnInfoHtml = isBorrowed ? '' : `
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #d9d9d9;">
+              <div style="font-size: 13px; color: #555; margin-bottom: 4px;">✅ วันที่คืน: ${escapeHtml(formatDateTimeStr(loan.returnedAt))}</div>
+              <div style="font-size: 13px; color: #555; margin-bottom: 4px;">👤 ผู้รับคืน: <b style="color: #2e7d32;">${escapeHtml(loan.receivedBy || '-')}</b></div>
+              ${loan.returnNote ? `<div style="font-size: 13px; color: #555;">💬 หมายเหตุ: ${escapeHtml(loan.returnNote)}</div>` : ''}
+            </div>
+          `;
+
           const card = document.createElement('div');
           card.style.cssText = 'background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;';
           card.innerHTML = `
@@ -576,13 +588,58 @@
               <div style="font-size: 13px; color: #555; margin-bottom: 4px;">⏳ กำหนดคืน: ${escapeHtml(formatDateTimeStr(loan.dueDate))}</div>
               ${remainingText ? `<div style="font-size: 13px; margin-bottom: 4px;">${remainingText}</div>` : ''}
               <div style="font-size: 13px; color: #555;">📝 วัตถุประสงค์: ${escapeHtml(loan.purpose || '-')}</div>
+              ${returnInfoHtml}
             </div>
             <div>
               <span style="padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; white-space: nowrap; ${badgeStyle}">${escapeHtml(badgeText)}</span>
             </div>
           `;
-          container.appendChild(card);
-        });
+          return card;
+        };
+
+        // สร้างหัวข้อของแต่ละส่วน
+        const createSectionHeader = (title, count, color) => {
+          const header = document.createElement('h3');
+          header.style.cssText = `margin: 20px 0 12px 0; padding-left: 10px; border-left: 4px solid ${color}; color: #333; font-size: 17px;`;
+          header.textContent = `${title} (${count})`;
+          return header;
+        };
+
+        // สร้างข้อความกรณีส่วนนั้นไม่มีรายการ
+        const createEmptyBox = (text) => {
+          const box = document.createElement('div');
+          box.style.cssText = 'text-align: center; color: #777; padding: 24px; background: #fff; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 12px;';
+          box.textContent = text;
+          return box;
+        };
+
+        // แยกรายการ: กำลังยืม / คืนแล้ว (ประวัติ เรียงจากคืนล่าสุดก่อน)
+        const activeLoans = result.filter(isBorrowedLoan);
+        const historyLoans = result
+          .filter(loan => !isBorrowedLoan(loan))
+          .sort((a, b) => {
+            const timeA = new Date(a.returnedAt || 0).getTime() || 0;
+            const timeB = new Date(b.returnedAt || 0).getTime() || 0;
+            return timeB - timeA;
+          });
+
+        container.innerHTML = '';
+
+        // ส่วนที่ 1: กำลังยืมอยู่
+        container.appendChild(createSectionHeader('กำลังยืมอยู่', activeLoans.length, '#1565c0'));
+        if (activeLoans.length === 0) {
+          container.appendChild(createEmptyBox('ไม่มีรายการที่กำลังยืมอยู่'));
+        } else {
+          activeLoans.forEach(loan => container.appendChild(createLoanCard(loan, true)));
+        }
+
+        // ส่วนที่ 2: ประวัติการยืมทั้งหมด (คืนแล้ว)
+        container.appendChild(createSectionHeader('ประวัติการยืมทั้งหมด', historyLoans.length, '#2e7d32'));
+        if (historyLoans.length === 0) {
+          container.appendChild(createEmptyBox('ยังไม่มีประวัติการคืนอุปกรณ์'));
+        } else {
+          historyLoans.forEach(loan => container.appendChild(createLoanCard(loan, false)));
+        }
 
       } catch (error) {
         container.innerHTML = `<div style="text-align: center; color: #d32f2f; padding: 40px; background: #fff; border-radius: 12px;">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${escapeHtml(error.message)}</div>`;
