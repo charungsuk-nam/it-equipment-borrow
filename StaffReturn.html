@@ -490,9 +490,7 @@
     let allLoans = [];
     let allEquipment = [];
     let allHistory = [];
-    const HISTORY_PAGE_SIZE = 2; // ตั้งไว้ที่ 2 ก่อนเพื่อเทส (เดี๋ยวค่อยเปลี่ยนกลับเป็น 20 ทีหลัง)
-    let displayLimit = HISTORY_PAGE_SIZE; 
-
+    let displayLimit = 20; 
 
     document.addEventListener('DOMContentLoaded', initSystem);
 
@@ -530,7 +528,7 @@
 
         while (typeof liff === 'undefined') {
 
-          if (checkCount > 2) {
+          if (checkCount > 20) {
 
             throw new Error('ไม่สามารถโหลด LINE LIFF SDK ได้ กรุณาเปิดผ่านแอป LINE อีกครั้ง');
 
@@ -835,7 +833,7 @@
     }
 
     function filterHistory() {
-      displayLimit = HISTORY_PAGE_SIZE; // รีเซ็ตกลับมาที่ค่าเริ่มต้นเมื่อมีการค้นหา
+      displayLimit = 20; // รีเซ็ตกลับมาที่ 20 เมื่อมีการพิมพ์ค้นหาใหม่
       const keyword = document.getElementById('historySearch').value.trim().toLowerCase();
       const items = allHistory.filter(function(h) {
         return !keyword || [h.equipmentName, h.equipmentId, h.borrowerName, h.receivedBy, h.loanId]
@@ -890,7 +888,7 @@
         list.appendChild(loadMoreContainer);
 
         document.getElementById('loadMoreBtn').addEventListener('click', () => {
-          displayLimit += HISTORY_PAGE_SIZE;
+          displayLimit += 20;
           renderHistory(items);
         });
       }
