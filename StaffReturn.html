@@ -528,7 +528,7 @@
 
         while (typeof liff === 'undefined') {
 
-          if (checkCount > 20) {
+          if (checkCount > 2) {
 
             throw new Error('ไม่สามารถโหลด LINE LIFF SDK ได้ กรุณาเปิดผ่านแอป LINE อีกครั้ง');
 
@@ -833,7 +833,7 @@
     }
 
     function filterHistory() {
-      displayLimit = 20; // รีเซ็ตกลับมาที่ 20 เมื่อมีการพิมพ์ค้นหาใหม่
+      displayLimit = 2; // รีเซ็ตกลับมาที่ 20 เมื่อมีการพิมพ์ค้นหาใหม่
       const keyword = document.getElementById('historySearch').value.trim().toLowerCase();
       const items = allHistory.filter(function(h) {
         return !keyword || [h.equipmentName, h.equipmentId, h.borrowerName, h.receivedBy, h.loanId]
@@ -888,7 +888,7 @@
         list.appendChild(loadMoreContainer);
 
         document.getElementById('loadMoreBtn').addEventListener('click', () => {
-          displayLimit += 20;
+          displayLimit += 2;
           renderHistory(items);
         });
       }
