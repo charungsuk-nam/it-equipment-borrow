@@ -490,6 +490,7 @@
     let allLoans = [];
     let allEquipment = [];
     let allHistory = [];
+    let displayLimit = 20; 
 
     document.addEventListener('DOMContentLoaded', initSystem);
 
@@ -831,20 +832,30 @@
       renderLoans(filtered);
     }
 
+    function filterHistory() {
+      displayLimit = 20; // รีเซ็ตกลับมาที่ 20 เมื่อมีการพิมพ์ค้นหาใหม่
+      const keyword = document.getElementById('historySearch').value.trim().toLowerCase();
+      const items = allHistory.filter(function(h) {
+        return !keyword || [h.equipmentName, h.equipmentId, h.borrowerName, h.receivedBy, h.loanId]
+          .join(' ').toLowerCase().includes(keyword);
+      });
+      renderHistory(items);
+    }
+
     function renderHistory(items) {
       const list = document.getElementById('historyList');
-      const empty = document.getElementById('historyEmpty');
-      setHistoryLoading(false);
-      list.innerHTML = '';
-      document.getElementById('historyCount').textContent = `พบ ${items.length} รายการที่คืนแล้ว`;
+      document.getElementById('historyCount').textContent = `แสดง ${Math.min(items.length, displayLimit)} จากทั้งหมด ${items.length} รายการ`;
 
-      if (!items.length) { empty.style.display = 'block'; return; }
-      empty.style.display = 'none';
+      if (!items.length) {
+        list.innerHTML = '<div class="state"><strong>ยังไม่มีประวัติการคืน</strong><div style="margin-top:5px;">เมื่อมีการรับคืนอุปกรณ์ รายการจะแสดงที่นี่</div></div>';
+        return;
+      }
 
-      items.forEach(h => {
-        const card = document.createElement('article');
-        card.className = 'item-card';
-        card.innerHTML = `
+      // ตัดข้อมูลมาแสดงผลแค่ตามจำนวน displayLimit
+      const visibleItems = items.slice(0, displayLimit);
+
+      list.innerHTML = visibleItems.map(h => `
+        <article class="item-card">
           <div class="item-top">
             <div class="item-icon">📜</div>
             <div class="item-title">
@@ -862,18 +873,25 @@
             <div class="row"><span>วัตถุประสงค์</span><span>${escapeHtml(h.purpose || '-')}</span></div>
             <div class="row"><span>หมายเหตุ</span><span>${escapeHtml(h.returnNote || '-')}</span></div>
           </div>
-        `;
-        list.appendChild(card);
-      });
-    }
+        </article>
+      `).join('');
 
-    function filterHistory() {
-      const keyword = document.getElementById('historySearch').value.trim().toLowerCase();
-      const filtered = allHistory.filter(h =>
-        [h.equipmentId, h.equipmentName, h.borrowerName, h.receivedBy, h.loanId]
-          .join(' ').toLowerCase().includes(keyword)
-      );
-      renderHistory(filtered);
+      // ถ้ายังมีข้อมูลเหลือที่ยังไม่ได้แสดง ให้สร้างปุ่ม "โหลดเพิ่ม" ต่อท้าย
+      if (displayLimit < items.length) {
+        const loadMoreContainer = document.createElement('div');
+        loadMoreContainer.style.cssText = 'text-align:center; margin-top:20px; grid-column:1/-1;';
+        loadMoreContainer.innerHTML = `
+          <button id="loadMoreBtn" class="btn btn-outline" style="padding: 10px 24px;">
+            👇 โหลดเพิ่มอีก (เหลืออีก ${items.length - displayLimit} รายการ)
+          </button>
+        `;
+        list.appendChild(loadMoreContainer);
+
+        document.getElementById('loadMoreBtn').addEventListener('click', () => {
+          displayLimit += 20;
+          renderHistory(items);
+        });
+      }
     }
 
     async function openReturnModal(loan) {
