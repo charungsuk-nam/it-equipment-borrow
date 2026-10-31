@@ -798,6 +798,7 @@
             <div class="row"><span>วันที่ยืม</span><span>${escapeHtml(formatDate(loan.borrowedAt))}</span></div>
             <div class="row"><span>กำหนดคืน</span><span style="font-weight:500;color:#2563eb;">${escapeHtml(formatDate(loan.dueDate))}</span></div>
             <div class="row"><span>วัตถุประสงค์</span><span>${escapeHtml(loan.purpose || '-')}</span></div>
+            ${getOverdueBadgeHtml(loan.dueDate)}
           </div>
           <div class="card-actions">
             <button class="btn btn-success return-btn"
@@ -1148,6 +1149,31 @@
 
     function escapeAttribute(value) {
       return escapeHtml(value).replace(/`/g, '&#096;');
+    }
+
+    function getOverdueBadgeHtml(dueDateStr) {
+      if (!dueDateStr) return '';
+      try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const dueObj = new Date(dueDateStr);
+        if (isNaN(dueObj.getTime())) return '';
+        dueObj.setHours(0, 0, 0, 0);
+
+        const diffTime = today - dueObj;
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 0) {
+          return `<div style="margin-top:6px; color:#dc2626; font-weight:600; font-size:12px;">🚨 เลยกำหนดมาแล้ว ${diffDays} วัน</div>`;
+        } else if (diffDays === 0) {
+          return `<div style="margin-top:6px; color:#d97706; font-weight:600; font-size:12px;">⚠️ ครบกำหนดคืนวันนี้</div>`;
+        } else {
+          return `<div style="margin-top:6px; color:#059669; font-size:12px;">⏳ ปกติ (เหลือเวลาอีก ${Math.abs(diffDays)} วัน)</div>`;
+        }
+      } catch (e) {
+        return '';
+      }
     }
   </script>
 </body>
