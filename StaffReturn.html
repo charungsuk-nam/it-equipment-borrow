@@ -490,7 +490,8 @@
     let allLoans = [];
     let allEquipment = [];
     let allHistory = [];
-    let displayLimit = 20; 
+    const HISTORY_PAGE_SIZE = 2;
+    let displayLimit = HISTORY_PAGE_SIZE;
 
     document.addEventListener('DOMContentLoaded', initSystem);
 
@@ -763,8 +764,9 @@
         allHistory = response.data || [];
         filterHistory();
       } catch (error) {
-        setHistoryLoading(false);
         Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: error.message });
+      } finally {
+        setHistoryLoading(false); // ปิดการ์ดหมุนทุกกรณี ทั้งสำเร็จและผิดพลาด
       }
     }
 
@@ -833,7 +835,7 @@
     }
 
     function filterHistory() {
-      displayLimit = 20; // รีเซ็ตกลับมาที่ 20 เมื่อมีการพิมพ์ค้นหาใหม่
+      displayLimit = HISTORY_PAGE_SIZE; // รีเซ็ตกลับมาที่ 20 เมื่อมีการพิมพ์ค้นหาใหม่
       const keyword = document.getElementById('historySearch').value.trim().toLowerCase();
       const items = allHistory.filter(function(h) {
         return !keyword || [h.equipmentName, h.equipmentId, h.borrowerName, h.receivedBy, h.loanId]
@@ -888,7 +890,7 @@
         list.appendChild(loadMoreContainer);
 
         document.getElementById('loadMoreBtn').addEventListener('click', () => {
-          displayLimit += 20;
+          displayLimit += HISTORY_PAGE_SIZE;
           renderHistory(items);
         });
       }
