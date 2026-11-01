@@ -693,7 +693,17 @@
       systemReady = true;
 
       document.getElementById('searchInput').disabled = false;
-      document.getElementById('dueDate').disabled = false;
+
+      // ล็อกวันที่คืน: เลือกได้เฉพาะวันนี้เป็นต้นไป (ใช้วันที่ตามเวลาเครื่อง ไม่ใช่ UTC)
+      const now = new Date();
+      const todayStr = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0');
+
+      const dueDateInput = document.getElementById('dueDate');
+      dueDateInput.min = todayStr;
+      dueDateInput.disabled = false;
+
       document.getElementById('purpose').disabled = false;
 
       const button = document.getElementById('submitButton');
@@ -857,13 +867,26 @@
 
     async function submitLoan(event) {
       event.preventDefault();
-
+      
       const equipmentIds = Object.keys(selectedEquipment);
       const dueDate = document.getElementById('dueDate').value;
       const purpose = document.getElementById('purpose').value.trim();
-
       if (!equipmentIds.length) {
         showError('กรุณาเลือกอุปกรณ์อย่างน้อย 1 ชิ้น');
+        return;
+      }
+      // ★ เช็กว่าเลือกวันที่คืนแล้ว
+      if (!dueDate) {
+        showError('กรุณาเลือกวันที่กำหนดคืน');
+        return;
+      }
+      // ★ เช็กไม่ให้เลือกวันย้อนหลัง (คำนวณจากเวลาเครื่องผู้ใช้ ไม่พึ่งแค่แอตทริบิวต์ min)
+      const now = new Date();
+      const todayStr = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0');
+      if (dueDate < todayStr) {
+        showError('ไม่สามารถเลือกวันที่คืนย้อนหลังได้ กรุณาเลือกวันนี้หรือวันข้างหน้า');
         return;
       }
 
